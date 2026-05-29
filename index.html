@@ -3,18 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>海外安全官指挥术语系统 v2.2</title>
+  <title>海外安全官指挥术语系统 v2.3</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-  <link rel="manifest" href="data:application/manifest+json,{'name':'海外安全官指挥术语系统','short_name':'安全术语','start_url':'.','display':'standalone','background_color':'#001a00','theme_color':'#00ff41','icons':[{'src':'https://via.placeholder.com/192x192/00ff41/001a00?text=🛡️','sizes':'192x192','type':'image/png'}]}">
+  <link rel="manifest" href="data:application/manifest+json,{'name':'海外安全官指挥术语系统','short_name':'安全术语','start_url':'.','display':'standalone','background_color':'#001a00','theme_color':'#00ff41'}">
   <meta name="theme-color" content="#00ff41">
   <style>
-    body { font-family: 'Microsoft YaHei', system-ui, sans-serif; }
+    body { font-family: 'Microsoft YaHei', system-ui, sans-serif; transition: all 0.3s; }
     .night-vision { background-color: #001a00 !important; color: #00ff41 !important; }
     .night-vision input, .night-vision select, .night-vision button { background-color: #002200; color: #00ff41; border-color: #00ff41; }
     .matrix-bg { background-image: linear-gradient(rgba(0,255,65,0.06) 1px,transparent 1px), linear-gradient(90deg,rgba(0,255,65,0.06) 1px,transparent 1px); background-size: 25px 25px; }
-    .card-hover { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-    .card-hover:hover { transform: translateY(-3px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); }
+    .card-hover:hover { transform: translateY(-3px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
     th { position: sticky; top: 0; z-index: 10; }
     .modal { animation: modalPop 0.3s ease; }
     @keyframes modalPop { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
@@ -23,16 +22,15 @@
 <body class="bg-zinc-100 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-screen">
 
 <div class="max-w-7xl mx-auto p-4">
-  <!-- Header -->
   <div class="flex justify-between items-center mb-8">
     <h1 id="appTitle" class="text-3xl font-bold flex items-center gap-3 text-green-700 dark:text-green-400">
       <i class="fas fa-shield-alt"></i> 海外安全官指挥术语系统
     </h1>
-    <div class="flex items-center gap-3">
-      <button onclick="startExam()" class="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-2xl flex items-center gap-2 font-medium card-hover">
+    <div class="flex gap-3">
+      <button onclick="startExam()" class="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-2xl flex items-center gap-2">
         <i class="fas fa-graduation-cap"></i> 开始考试
       </button>
-      <button onclick="toggleSettings()" class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-2xl flex items-center gap-2 card-hover">
+      <button onclick="toggleSettings()" class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-2xl flex items-center gap-2">
         <i class="fas fa-cog"></i>
       </button>
     </div>
@@ -40,35 +38,32 @@
 
   <!-- 设置面板 -->
   <div id="settingsPanel" class="hidden fixed top-20 right-6 bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl p-6 w-80 z-50 border border-gray-200 dark:border-zinc-700">
-    <h3 class="font-bold mb-6 text-lg flex items-center gap-2"><i class="fas fa-cog"></i> 系统设置</h3>
+    <h3 class="font-bold mb-6 text-lg">⚙️ 系统设置</h3>
     <div class="space-y-6">
       <div>
-        <label class="block text-sm mb-3 font-medium">主题模式</label>
+        <label class="block text-sm mb-3">主题模式</label>
         <div class="grid grid-cols-3 gap-3">
-          <button onclick="setTheme(0)" class="py-4 rounded-2xl border hover:bg-gray-100">☀️ 亮色</button>
-          <button onclick="setTheme(1)" class="py-4 rounded-2xl border hover:bg-gray-100">🌙 暗黑</button>
+          <button onclick="setTheme(0)" class="py-4 rounded-2xl border">☀️ 亮色</button>
+          <button onclick="setTheme(1)" class="py-4 rounded-2xl border">🌙 暗黑</button>
           <button onclick="setTheme(2)" class="py-4 rounded-2xl border bg-green-900 text-white">🌲 夜视</button>
         </div>
       </div>
       <div>
-        <label class="block text-sm mb-3 font-medium">界面语言</label>
+        <label class="block text-sm mb-3">界面语言</label>
         <div class="flex gap-3">
-          <button onclick="switchLang('zh')" class="flex-1 py-4 rounded-2xl border bg-green-100 dark:bg-green-900">中文</button>
+          <button onclick="switchLang('zh')" class="flex-1 py-4 rounded-2xl border">中文</button>
           <button onclick="switchLang('en')" class="flex-1 py-4 rounded-2xl border">English</button>
         </div>
       </div>
-      <button onclick="fakeCloudSync()" class="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl flex items-center justify-center gap-2 card-hover">
-        <i class="fas fa-cloud-upload-alt"></i> 云同步（演示）
-      </button>
+      <button onclick="fakeCloudSync()" class="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl">云同步（演示）</button>
     </div>
-    <button onclick="toggleSettings()" class="mt-8 w-full py-4 text-red-500 hover:bg-red-50 rounded-2xl">关闭设置</button>
+    <button onclick="toggleSettings()" class="mt-8 w-full py-4 text-red-500 hover:bg-red-50 rounded-2xl">关闭</button>
   </div>
 
   <!-- 工具栏 -->
   <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow p-5 mb-8 flex flex-wrap gap-4 items-center">
-    <input type="text" id="searchInput" placeholder="🔍 搜索 中文 / 音译 / 斯瓦希里语..." 
-           onkeyup="filterTable()" class="flex-1 min-w-[300px] px-6 py-4 rounded-2xl border focus:border-green-500 focus:ring-2 focus:ring-green-200">
-    
+    <input type="text" id="searchInput" placeholder="🔍 搜索 中文 / 音译 / 斯瓦希里语..." onkeyup="filterTable()" 
+           class="flex-1 min-w-[280px] px-6 py-4 rounded-2xl border focus:border-green-500">
     <select id="categoryFilter" onchange="filterTable()" class="px-6 py-4 rounded-2xl border">
       <option value="">全部分类</option>
       <option value="一、指挥与身份">一、指挥与身份</option>
@@ -78,13 +73,10 @@
       <option value="五、应急与状态">五、应急与状态</option>
       <option value="六、协调与日常">六、协调与日常</option>
     </select>
-
     <div class="flex gap-3">
-      <button onclick="showAddModal()" class="px-6 py-4 bg-green-600 hover:bg-green-700 text-white rounded-2xl flex items-center gap-2 card-hover">
-        <i class="fas fa-plus"></i> 新增
-      </button>
-      <button onclick="exportCSV()" class="px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl flex items-center gap-2 card-hover">导出CSV</button>
-      <button onclick="document.getElementById('importFile').click()" class="px-6 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl flex items-center gap-2 card-hover">导入CSV</button>
+      <button onclick="showAddModal()" class="px-6 py-4 bg-green-600 hover:bg-green-700 text-white rounded-2xl flex items-center gap-2">新增</button>
+      <button onclick="exportCSV()" class="px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl">导出</button>
+      <button onclick="document.getElementById('importFile').click()" class="px-6 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl">导入</button>
       <input type="file" id="importFile" accept=".csv" class="hidden" onchange="importCSV(event)">
     </div>
   </div>
@@ -94,12 +86,12 @@
     <table class="w-full" id="dataTable">
       <thead class="bg-zinc-100 dark:bg-zinc-800">
         <tr>
-          <th class="px-8 py-6 text-left font-medium">类别</th>
-          <th class="px-8 py-6 text-left font-medium">序号</th>
-          <th class="px-8 py-6 text-left font-medium">中文意义</th>
-          <th class="px-8 py-6 text-left font-medium">参考词</th>
-          <th class="px-8 py-6 text-left font-medium">推荐音译</th>
-          <th class="px-8 py-6 w-32 text-center font-medium">操作</th>
+          <th class="px-8 py-6 text-left">类别</th>
+          <th class="px-8 py-6 text-left">序号</th>
+          <th class="px-8 py-6 text-left">中文意义</th>
+          <th class="px-8 py-6 text-left">参考词</th>
+          <th class="px-8 py-6 text-left">推荐音译</th>
+          <th class="px-8 py-6 text-center">操作</th>
         </tr>
       </thead>
       <tbody id="tableBody" class="divide-y divide-gray-100 dark:divide-zinc-700"></tbody>
@@ -107,41 +99,41 @@
   </div>
 </div>
 
-<!-- 考试界面 -->
+<!-- 考试模态框 -->
 <div id="examModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100]">
-  <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-2xl mx-4 shadow-2xl overflow-hidden">
-    <div class="p-6 border-b flex justify-between items-center bg-zinc-50 dark:bg-zinc-800">
+  <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-2xl mx-4">
+    <div class="p-6 border-b flex justify-between items-center">
       <h2 class="text-2xl font-bold">指挥术语考试</h2>
       <div class="flex items-center gap-6">
-        <span id="examScore" class="font-mono text-2xl font-semibold text-green-600">0分</span>
-        <span id="examProgress" class="font-mono text-lg">1/10</span>
+        <span id="examScore" class="font-bold text-2xl text-green-600">0分</span>
+        <span id="examProgress" class="font-mono">1/10</span>
       </div>
     </div>
-    <div class="p-10 min-h-[320px]" id="examContent"></div>
+    <div class="p-10 min-h-[300px]" id="examContent"></div>
     <div class="p-6 border-t flex gap-4">
-      <button onclick="exitExam()" class="flex-1 py-5 border rounded-2xl hover:bg-gray-100">退出考试</button>
-      <button onclick="nextQuestion()" id="nextBtn" class="flex-1 py-5 bg-green-600 text-white rounded-2xl">下一题</button>
+      <button onclick="exitExam()" class="flex-1 py-5 border rounded-2xl">退出</button>
+      <button onclick="submitExamAnswer()" class="flex-1 py-5 bg-green-600 text-white rounded-2xl">提交答案</button>
     </div>
   </div>
 </div>
 
 <!-- 新增/编辑弹窗 -->
 <div id="modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-  <div class="bg-white dark:bg-zinc-900 rounded-3xl p-8 w-full max-w-lg modal">
+  <div class="bg-white dark:bg-zinc-900 rounded-3xl p-8 w-full max-w-lg">
     <h2 id="modalTitle" class="text-2xl font-bold mb-6">新增术语</h2>
     <input type="hidden" id="editId">
     <div class="space-y-6">
-      <div><label class="block text-sm mb-2 font-medium">类别</label><input id="catInput" type="text" class="w-full px-6 py-4 border rounded-2xl focus:border-green-500"></div>
+      <div><label class="block text-sm mb-2">类别</label><input id="catInput" type="text" class="w-full px-6 py-4 border rounded-2xl"></div>
       <div class="grid grid-cols-2 gap-6">
-        <div><label class="block text-sm mb-2 font-medium">序号</label><input id="numInput" type="number" class="w-full px-6 py-4 border rounded-2xl"></div>
-        <div><label class="block text-sm mb-2 font-medium">中文意义</label><input id="cnInput" type="text" class="w-full px-6 py-4 border rounded-2xl"></div>
+        <div><label class="block text-sm mb-2">序号</label><input id="numInput" type="number" class="w-full px-6 py-4 border rounded-2xl"></div>
+        <div><label class="block text-sm mb-2">中文意义</label><input id="cnInput" type="text" class="w-full px-6 py-4 border rounded-2xl"></div>
       </div>
-      <div><label class="block text-sm mb-2 font-medium">斯瓦希里语/参考词</label><input id="swInput" type="text" class="w-full px-6 py-4 border rounded-2xl"></div>
-      <div><label class="block text-sm mb-2 font-medium">推荐音译</label><input id="pyInput" type="text" class="w-full px-6 py-4 border rounded-2xl"></div>
+      <div><label class="block text-sm mb-2">斯瓦希里语/参考词</label><input id="swInput" type="text" class="w-full px-6 py-4 border rounded-2xl"></div>
+      <div><label class="block text-sm mb-2">推荐音译</label><input id="pyInput" type="text" class="w-full px-6 py-4 border rounded-2xl"></div>
     </div>
     <div class="flex gap-4 mt-10">
-      <button onclick="saveTerm()" class="flex-1 py-5 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-medium">保存</button>
-      <button onclick="closeModal()" class="flex-1 py-5 bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 rounded-2xl">取消</button>
+      <button onclick="saveTerm()" class="flex-1 py-5 bg-green-600 text-white rounded-2xl">保存</button>
+      <button onclick="closeModal()" class="flex-1 py-5 bg-gray-200 rounded-2xl">取消</button>
     </div>
   </div>
 </div>
@@ -258,19 +250,12 @@ let examQuestions = [];
 let currentExamIndex = 0;
 let examScore = 0;
 
-// ==================== 多语言 ====================
-const translations = {
-  zh: { title: "海外安全官指挥术语系统", search: "🔍 搜索 中文 / 音译 / 斯瓦希里语..." },
-  en: { title: "Overseas Security Command Terminology System", search: "🔍 Search Chinese / Transliteration..." }
-};
-
+// ==================== 多语言 & 主题 ====================
 function switchLang(lang) {
   currentLang = lang;
-  document.getElementById('appTitle').textContent = translations[lang].title;
-  document.getElementById('searchInput').placeholder = translations[lang].search;
+  document.getElementById('appTitle').textContent = lang === 'zh' ? "海外安全官指挥术语系统" : "Overseas Security Command Terminology";
 }
 
-// ==================== 主题切换 ====================
 function setTheme(theme) {
   currentTheme = theme;
   document.body.classList.remove('dark', 'night-vision', 'matrix-bg');
@@ -278,53 +263,46 @@ function setTheme(theme) {
   if (theme === 2) document.body.classList.add('night-vision', 'matrix-bg');
 }
 
-function toggleNightVision() {
-  setTheme(currentTheme === 2 ? 0 : 2);
-}
-
-// ==================== 设置面板 ====================
 function toggleSettings() {
   document.getElementById('settingsPanel').classList.toggle('hidden');
 }
 
 function fakeCloudSync() {
   exportCSV();
-  alert('✅ 云同步演示完成！\n数据已导出为CSV文件。');
+  alert('✅ 云同步演示完成！数据已导出。');
 }
 
-// ==================== 表格渲染 ====================
+// ==================== 表格功能 ====================
 function renderTable(data) {
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
   data.forEach(item => {
     const tr = document.createElement('tr');
-    tr.className = 'card-hover hover:bg-green-50 dark:hover:bg-zinc-800';
+    tr.className = 'hover:bg-green-50 dark:hover:bg-zinc-800';
     tr.innerHTML = `
       <td class="px-8 py-6">${item.cat}</td>
-      <td class="px-8 py-6 font-semibold">${item.num}</td>
+      <td class="px-8 py-6 font-medium">${item.num}</td>
       <td class="px-8 py-6">${item.cn}</td>
       <td class="px-8 py-6">${item.sw}</td>
-      <td class="px-8 py-6 font-medium text-green-600 dark:text-green-400">${item.py}</td>
+      <td class="px-8 py-6 font-medium text-green-600">${item.py}</td>
       <td class="px-8 py-6 text-center">
-        <button onclick="editTerm(${item.id})" class="text-blue-500 hover:text-blue-600 mx-2 text-xl"><i class="fas fa-edit"></i></button>
-        <button onclick="deleteTerm(${item.id})" class="text-red-500 hover:text-red-600 mx-2 text-xl"><i class="fas fa-trash"></i></button>
+        <button onclick="editTerm(${item.id})" class="text-blue-500 hover:text-blue-600 mx-2"><i class="fas fa-edit"></i></button>
+        <button onclick="deleteTerm(${item.id})" class="text-red-500 hover:text-red-600 mx-2"><i class="fas fa-trash"></i></button>
       </td>
     `;
     tbody.appendChild(tr);
   });
 }
 
-// ==================== 搜索筛选 ====================
 function filterTable() {
-  const search = document.getElementById('searchInput').value.toLowerCase().trim();
+  const search = document.getElementById('searchInput').value.toLowerCase();
   const category = document.getElementById('categoryFilter').value;
-  
   let filtered = terms;
   if (category) filtered = filtered.filter(t => t.cat === category);
   if (search) {
     filtered = filtered.filter(t => 
-      t.cn.toLowerCase().includes(search) ||
-      t.sw.toLowerCase().includes(search) ||
+      t.cn.toLowerCase().includes(search) || 
+      t.sw.toLowerCase().includes(search) || 
       t.py.toLowerCase().includes(search)
     );
   }
@@ -360,15 +338,15 @@ function saveTerm() {
   const id = document.getElementById('editId').value;
   const newTerm = {
     id: id ? parseInt(id) : Date.now(),
-    cat: document.getElementById('catInput').value.trim(),
+    cat: document.getElementById('catInput').value,
     num: parseInt(document.getElementById('numInput').value) || 0,
-    cn: document.getElementById('cnInput').value.trim(),
-    sw: document.getElementById('swInput').value.trim(),
-    py: document.getElementById('pyInput').value.trim()
+    cn: document.getElementById('cnInput').value,
+    sw: document.getElementById('swInput').value,
+    py: document.getElementById('pyInput').value
   };
   if (id) {
     const index = terms.findIndex(t => t.id === parseInt(id));
-    if (index !== -1) terms[index] = newTerm;
+    if (index > -1) terms[index] = newTerm;
   } else {
     terms.push(newTerm);
   }
@@ -378,7 +356,7 @@ function saveTerm() {
 }
 
 function deleteTerm(id) {
-  if (confirm('确定要删除这条记录吗？')) {
+  if (confirm('确定删除此记录？')) {
     terms = terms.filter(t => t.id !== id);
     saveToLocal();
     filterTable();
@@ -389,7 +367,7 @@ function closeModal() {
   document.getElementById('modal').classList.add('hidden');
 }
 
-// ==================== 本地存储 ====================
+// ==================== 存储 & CSV ====================
 function saveToLocal() {
   localStorage.setItem('security_terms_v2', JSON.stringify(terms));
 }
@@ -400,17 +378,14 @@ function loadFromLocal() {
   renderTable(terms);
 }
 
-// ==================== CSV ====================
 function exportCSV() {
   let csv = "类别,序号,中文意义,斯瓦希里语/参考词,推荐音译\n";
-  terms.forEach(t => {
-    csv += `"\( {t.cat}", \){t.num},"\( {t.cn}"," \){t.sw}","${t.py}"\n`;
-  });
-  const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = `安全指挥术语_${new Date().toISOString().slice(0,10)}.csv`;
-  link.click();
+  terms.forEach(t => csv += `"\( {t.cat}", \){t.num},"\( {t.cn}"," \){t.sw}","${t.py}"\n`);
+  const blob = new Blob([csv], {type: 'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '安全指挥术语.csv';
+  a.click();
 }
 
 function importCSV(e) {
@@ -421,21 +396,14 @@ function importCSV(e) {
     const rows = ev.target.result.split('\n');
     rows.slice(1).forEach(row => {
       if (!row.trim()) return;
-      const cols = row.split(',').map(c => c.replace(/"/g, '').trim());
+      const cols = row.split(',').map(c => c.replace(/"/g,'').trim());
       if (cols.length >= 5) {
-        terms.push({
-          id: Date.now() + Math.random(),
-          cat: cols[0],
-          num: parseInt(cols[1]) || 0,
-          cn: cols[2],
-          sw: cols[3],
-          py: cols[4]
-        });
+        terms.push({id: Date.now(), cat: cols[0], num: parseInt(cols[1]), cn: cols[2], sw: cols[3], py: cols[4]});
       }
     });
     saveToLocal();
     filterTable();
-    alert('✅ CSV 导入成功！');
+    alert('导入成功！');
   };
   reader.readAsText(file);
 }
@@ -451,32 +419,22 @@ function startExam() {
 
 function showExamQuestion() {
   const q = examQuestions[currentExamIndex];
-  const html = `
-    <div>
-      <div class="text-sm text-gray-500 mb-2">第 ${currentExamIndex + 1} / 10 题</div>
-      <div class="text-xl font-medium mb-8 leading-relaxed">${q.cn}</div>
-      <input type="text" id="examAnswerInput" placeholder="请输入推荐音译..." 
-             class="w-full px-6 py-5 border rounded-2xl text-lg focus:border-green-500" 
-             onkeypress="if(event.key === 'Enter') submitExamAnswer()">
-    </div>
+  document.getElementById('examContent').innerHTML = `
+    <div class="text-xl font-medium mb-8">${q.cn}</div>
+    <input type="text" id="examAnswer" placeholder="输入推荐音译" class="w-full px-6 py-5 border rounded-2xl text-lg" autofocus>
   `;
-  document.getElementById('examContent').innerHTML = html;
-  document.getElementById('examProgress').textContent = `${currentExamIndex + 1}/10`;
+  document.getElementById('examProgress').textContent = `${currentExamIndex+1}/10`;
   document.getElementById('examScore').textContent = `${examScore}分`;
-  document.getElementById('examAnswerInput').focus();
 }
 
 function submitExamAnswer() {
-  const answer = document.getElementById('examAnswerInput').value.trim();
-  const correct = examQuestions[currentExamIndex].py;
-  if (answer.toLowerCase() === correct.toLowerCase()) {
-    examScore += 10;
+  const answer = document.getElementById('examAnswer').value.trim();
+  if (!answer) {
+    alert('请输入答案');
+    return;
   }
-  document.getElementById('examScore').textContent = `${examScore}分`;
-  nextQuestion();
-}
-
-function nextQuestion() {
+  const correct = examQuestions[currentExamIndex].py;
+  if (answer.toLowerCase() === correct.toLowerCase()) examScore += 10;
   currentExamIndex++;
   if (currentExamIndex >= 10) {
     showExamResult();
@@ -486,15 +444,13 @@ function nextQuestion() {
 }
 
 function showExamResult() {
-  const html = `
+  document.getElementById('examContent').innerHTML = `
     <div class="text-center py-12">
-      <h2 class="text-4xl font-bold mb-6">考试结束</h2>
-      <div class="text-7xl font-mono mb-6 text-green-600">${examScore} <span class="text-3xl">分</span></div>
-      <p class="text-2xl mb-8">${examScore >= 80 ? '🎉 优秀！' : examScore >= 60 ? '✅ 及格' : '⚠️ 需要加强练习'}</p>
-      <button onclick="restartExam()" class="px-10 py-4 bg-green-600 text-white rounded-2xl text-lg">重新考试</button>
+      <h2 class="text-4xl font-bold mb-4">考试结束</h2>
+      <p class="text-6xl font-bold text-green-600 mb-6">${examScore}分</p>
+      <button onclick="restartExam()" class="px-8 py-4 bg-green-600 text-white rounded-2xl">重新考试</button>
     </div>
   `;
-  document.getElementById('examContent').innerHTML = html;
 }
 
 function restartExam() {
@@ -503,9 +459,7 @@ function restartExam() {
 }
 
 function exitExam() {
-  if (confirm('确定要退出考试吗？')) {
-    document.getElementById('examModal').classList.add('hidden');
-  }
+  if (confirm('确定退出考试？')) document.getElementById('examModal').classList.add('hidden');
 }
 
 // ==================== 初始化 ====================
