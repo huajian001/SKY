@@ -3,54 +3,80 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>海外安全官指挥术语系统 v1.0</title>
+  <title>海外安全官指挥术语系统 v2.0</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <link rel="manifest" href="data:application/manifest+json,{
+    'name': '海外安全官指挥术语系统',
+    'short_name': '安全术语',
+    'start_url': '.',
+    'display': 'standalone',
+    'background_color': '#001a00',
+    'theme_color': '#00ff41',
+    'icons': [{'src': 'https://via.placeholder.com/192x192/00ff41/001a00?text=🛡️', 'sizes': '192x192', 'type': 'image/png'}]
+  }">
+  <meta name="theme-color" content="#00ff41">
   <style>
-    body { font-family: 'Microsoft YaHei', system-ui, sans-serif; }
-    .night-vision {
-      background-color: #001a00 !important;
-      color: #00ff41 !important;
-    }
-    .night-vision table, .night-vision th, .night-vision td {
-      border-color: #00ff41 !important;
-    }
-    .night-vision input, .night-vision select, .night-vision button {
-      background-color: #002200;
-      color: #00ff41;
-      border-color: #00ff41;
-    }
-    .matrix-bg {
-      background-image: 
-        linear-gradient(rgba(0, 255, 65, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 255, 65, 0.04) 1px, transparent 1px);
-      background-size: 25px 25px;
-    }
-    th { position: sticky; top: 0; z-index: 10; }
+    body { font-family: 'Microsoft YaHei', system-ui, sans-serif; transition: all 0.3s; }
+    .night-vision { background-color: #001a00 !important; color: #00ff41 !important; }
+    .night-vision input, .night-vision select, .night-vision button { background-color: #002200; color: #00ff41; border-color: #00ff41; }
+    .matrix-bg { background-image: linear-gradient(rgba(0,255,65,0.05) 1px,transparent 1px), linear-gradient(90deg,rgba(0,255,65,0.05) 1px,transparent 1px); background-size: 25px 25px; }
+    th { position: sticky; top: 0; z-index: 10; background-color: inherit; }
   </style>
 </head>
 <body class="bg-zinc-100 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-screen">
 
 <div class="max-w-7xl mx-auto p-4">
   <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold text-green-700 dark:text-green-500 flex items-center gap-3">
+    <h1 id="appTitle" class="text-3xl font-bold text-green-700 dark:text-green-500 flex items-center gap-3">
       <i class="fas fa-shield-alt"></i> 海外安全官指挥术语系统
     </h1>
-    <button onclick="toggleNightVision()" 
-            class="px-6 py-3 bg-green-700 hover:bg-green-600 text-white rounded-xl flex items-center gap-2 font-medium">
-      <i class="fas fa-eye"></i> <span id="nightBtn">夜视模式 ON</span>
-    </button>
+    <div class="flex gap-3">
+      <button onclick="toggleSettings()" class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-2xl flex items-center gap-2">
+        <i class="fas fa-cog"></i> 设置
+      </button>
+      <button onclick="toggleNightVision()" id="nightBtn" class="px-6 py-3 bg-green-700 hover:bg-green-600 text-white rounded-2xl flex items-center gap-2">
+        <i class="fas fa-eye"></i> 夜视模式
+      </button>
+    </div>
+  </div>
+
+  <!-- 设置面板 -->
+  <div id="settingsPanel" class="hidden fixed top-20 right-6 bg-white dark:bg-zinc-900 shadow-2xl rounded-3xl p-6 w-80 z-50 border border-gray-200 dark:border-zinc-700">
+    <h3 class="font-bold mb-5 text-lg">⚙️ 系统设置</h3>
+    <div class="space-y-6">
+      <div>
+        <label class="block text-sm mb-3">主题模式</label>
+        <div class="grid grid-cols-3 gap-3">
+          <button onclick="setTheme(0)" class="py-4 rounded-2xl border hover:bg-gray-100 dark:hover:bg-zinc-800">☀️ 亮色</button>
+          <button onclick="setTheme(1)" class="py-4 rounded-2xl border hover:bg-gray-100 dark:hover:bg-zinc-800">🌙 暗黑</button>
+          <button onclick="setTheme(2)" class="py-4 rounded-2xl border bg-green-900 text-white">🌲 夜视</button>
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm mb-3">界面语言</label>
+        <div class="flex gap-3">
+          <button onclick="switchLang('zh')" class="flex-1 py-4 rounded-2xl border bg-green-100 dark:bg-green-900">中文</button>
+          <button onclick="switchLang('en')" class="flex-1 py-4 rounded-2xl border">English</button>
+        </div>
+      </div>
+      <div>
+        <button onclick="fakeCloudSync()" class="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl flex items-center justify-center gap-2">
+          <i class="fas fa-cloud-upload-alt"></i> 云同步（演示）
+        </button>
+      </div>
+    </div>
+    <button onclick="toggleSettings()" class="mt-6 w-full py-4 text-red-500 hover:bg-red-50 rounded-2xl">关闭设置</button>
   </div>
 
   <!-- 工具栏 -->
-  <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl shadow mb-6 flex flex-wrap gap-4 items-center">
+  <div class="bg-white dark:bg-zinc-900 p-5 rounded-3xl shadow mb-6 flex flex-wrap gap-4 items-center">
     <input type="text" id="searchInput" 
            placeholder="🔍 搜索 中文 / 音译 / 斯瓦希里语..." 
            onkeyup="filterTable()"
-           class="flex-1 min-w-[300px] px-5 py-4 border border-gray-300 dark:border-zinc-700 rounded-xl focus:outline-none focus:border-green-500 text-base">
-
-    <select id="categoryFilter" onchange="filterTable()" 
-            class="px-5 py-4 border border-gray-300 dark:border-zinc-700 rounded-xl">
+           class="flex-1 min-w-[280px] px-5 py-4 rounded-2xl border focus:border-green-500 text-base">
+    
+    <select id="categoryFilter" onchange="filterTable()" class="px-5 py-4 rounded-2xl border">
       <option value="">全部分类</option>
       <option value="一、指挥与身份">一、指挥与身份</option>
       <option value="二、行动指令">二、行动指令</option>
@@ -61,23 +87,23 @@
     </select>
 
     <div class="flex gap-3">
-      <button onclick="showAddModal()" class="px-6 py-4 bg-green-600 hover:bg-green-700 text-white rounded-xl flex items-center gap-2">
+      <button onclick="showAddModal()" class="px-6 py-4 bg-green-600 hover:bg-green-700 text-white rounded-2xl flex items-center gap-2">
         <i class="fas fa-plus"></i> 新增
       </button>
-      <button onclick="exportCSV()" class="px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl flex items-center gap-2">
-        <i class="fas fa-download"></i> 导出CSV
+      <button onclick="exportCSV()" class="px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl flex items-center gap-2">
+        <i class="fas fa-download"></i> 导出
       </button>
-      <button onclick="document.getElementById('importFile').click()" class="px-6 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl flex items-center gap-2">
-        <i class="fas fa-upload"></i> 导入CSV
+      <button onclick="document.getElementById('importFile').click()" class="px-6 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl flex items-center gap-2">
+        <i class="fas fa-upload"></i> 导入
       </button>
       <input type="file" id="importFile" accept=".csv" class="hidden" onchange="importCSV(event)">
     </div>
   </div>
 
   <!-- 表格 -->
-  <div class="overflow-x-auto bg-white dark:bg-zinc-900 rounded-2xl shadow">
+  <div class="overflow-x-auto bg-white dark:bg-zinc-900 rounded-3xl shadow">
     <table class="w-full text-sm" id="dataTable">
-      <thead class="bg-zinc-200 dark:bg-zinc-800 sticky top-0">
+      <thead class="bg-zinc-200 dark:bg-zinc-800">
         <tr>
           <th class="px-6 py-5 text-left">类别</th>
           <th class="px-6 py-5 text-left">序号</th>
@@ -97,32 +123,30 @@
   <div class="bg-white dark:bg-zinc-900 rounded-3xl p-8 w-full max-w-lg mx-4">
     <h2 id="modalTitle" class="text-2xl font-bold mb-6">新增术语</h2>
     <input type="hidden" id="editId">
-
     <div class="space-y-5">
       <div>
-        <label class="block text-sm mb-1 font-medium">类别</label>
+        <label class="block text-sm mb-1">类别</label>
         <input type="text" id="catInput" class="w-full px-5 py-4 border rounded-2xl">
       </div>
       <div class="grid grid-cols-2 gap-5">
         <div>
-          <label class="block text-sm mb-1 font-medium">序号</label>
+          <label class="block text-sm mb-1">序号</label>
           <input type="number" id="numInput" class="w-full px-5 py-4 border rounded-2xl">
         </div>
         <div>
-          <label class="block text-sm mb-1 font-medium">中文意义</label>
+          <label class="block text-sm mb-1">中文意义</label>
           <input type="text" id="cnInput" class="w-full px-5 py-4 border rounded-2xl">
         </div>
       </div>
       <div>
-        <label class="block text-sm mb-1 font-medium">斯瓦希里语/参考词</label>
+        <label class="block text-sm mb-1">斯瓦希里语/参考词</label>
         <input type="text" id="swInput" class="w-full px-5 py-4 border rounded-2xl">
       </div>
       <div>
-        <label class="block text-sm mb-1 font-medium">推荐音译</label>
+        <label class="block text-sm mb-1">推荐音译</label>
         <input type="text" id="pyInput" class="w-full px-5 py-4 border rounded-2xl">
       </div>
     </div>
-
     <div class="flex gap-4 mt-8">
       <button onclick="saveTerm()" class="flex-1 py-5 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-medium">保存</button>
       <button onclick="closeModal()" class="flex-1 py-5 bg-gray-300 hover:bg-gray-400 dark:bg-zinc-700 rounded-2xl">取消</button>
@@ -235,23 +259,60 @@ let terms = [
   {id:100, cat:"六、协调与日常", num:100, cn:"看看/检查", sw:"Angalia", py:"安格利亚"}
 ];
 
-// ==================== 渲染函数 ====================
+// ==================== 多语言 ====================
+const translations = {
+  zh: { title: "海外安全官指挥术语系统", search: "🔍 搜索 中文 / 音译 / 斯瓦希里语..." },
+  en: { title: "Overseas Security Command Terminology", search: "🔍 Search Chinese / Transliteration..." }
+};
+let currentLang = 'zh';
+
+function switchLang(lang) {
+  currentLang = lang;
+  document.getElementById('appTitle').textContent = translations[lang].title;
+  document.getElementById('searchInput').placeholder = translations[lang].search;
+}
+
+// ==================== 主题切换 ====================
+let currentTheme = 0;
+function setTheme(theme) {
+  currentTheme = theme;
+  document.body.classList.remove('dark', 'night-vision', 'matrix-bg');
+  if (theme === 1) document.body.classList.add('dark');
+  if (theme === 2) document.body.classList.add('night-vision', 'matrix-bg');
+}
+
+function toggleNightVision() {
+  if (currentTheme !== 2) setTheme(2);
+  else setTheme(0);
+}
+
+// ==================== 设置面板 ====================
+function toggleSettings() {
+  document.getElementById('settingsPanel').classList.toggle('hidden');
+}
+
+// ==================== 云同步演示 ====================
+function fakeCloudSync() {
+  exportCSV();
+  alert('✅ 云同步演示完成\n数据已导出为CSV\n\n实际云同步可对接 Firebase / Supabase 等服务');
+}
+
+// ==================== 表格渲染 ====================
 function renderTable(data) {
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
-  
   data.forEach(item => {
     const tr = document.createElement('tr');
     tr.className = 'hover:bg-green-50 dark:hover:bg-zinc-800 transition-colors';
     tr.innerHTML = `
-      <td class="px-6 py-5 whitespace-nowrap">${item.cat}</td>
-      <td class="px-6 py-5 font-semibold">${item.num}</td>
+      <td class="px-6 py-5">${item.cat}</td>
+      <td class="px-6 py-5 font-medium">${item.num}</td>
       <td class="px-6 py-5">${item.cn}</td>
       <td class="px-6 py-5">${item.sw}</td>
       <td class="px-6 py-5 font-medium text-green-600 dark:text-green-400">${item.py}</td>
       <td class="px-6 py-5 text-center">
-        <button onclick="editTerm(${item.id})" class="text-blue-500 hover:text-blue-600 px-3 text-lg"><i class="fas fa-edit"></i></button>
-        <button onclick="deleteTerm(${item.id})" class="text-red-500 hover:text-red-600 px-3 text-lg"><i class="fas fa-trash"></i></button>
+        <button onclick="editTerm(${item.id})" class="text-blue-500 hover:text-blue-600 mx-2"><i class="fas fa-edit"></i></button>
+        <button onclick="deleteTerm(${item.id})" class="text-red-500 hover:text-red-600 mx-2"><i class="fas fa-trash"></i></button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -260,20 +321,17 @@ function renderTable(data) {
 
 // ==================== 筛选 ====================
 function filterTable() {
-  const search = document.getElementById('searchInput').value.toLowerCase().trim();
+  const search = document.getElementById('searchInput').value.toLowerCase();
   const category = document.getElementById('categoryFilter').value;
-  
   let filtered = terms;
-
   if (category) filtered = filtered.filter(t => t.cat === category);
   if (search) {
     filtered = filtered.filter(t => 
-      t.cn.toLowerCase().includes(search) ||
-      t.sw.toLowerCase().includes(search) ||
+      t.cn.toLowerCase().includes(search) || 
+      t.sw.toLowerCase().includes(search) || 
       t.py.toLowerCase().includes(search)
     );
   }
-
   renderTable(filtered);
 }
 
@@ -292,7 +350,6 @@ function showAddModal() {
 function editTerm(id) {
   const term = terms.find(t => t.id === id);
   if (!term) return;
-  
   document.getElementById('modalTitle').textContent = '编辑术语';
   document.getElementById('editId').value = term.id;
   document.getElementById('catInput').value = term.cat;
@@ -307,29 +364,27 @@ function saveTerm() {
   const id = document.getElementById('editId').value;
   const newTerm = {
     id: id ? parseInt(id) : Date.now(),
-    cat: document.getElementById('catInput').value.trim(),
+    cat: document.getElementById('catInput').value,
     num: parseInt(document.getElementById('numInput').value) || 0,
-    cn: document.getElementById('cnInput').value.trim(),
-    sw: document.getElementById('swInput').value.trim(),
-    py: document.getElementById('pyInput').value.trim()
+    cn: document.getElementById('cnInput').value,
+    sw: document.getElementById('swInput').value,
+    py: document.getElementById('pyInput').value
   };
-
   if (id) {
     const index = terms.findIndex(t => t.id === parseInt(id));
-    if (index > -1) terms[index] = newTerm;
+    if (index !== -1) terms[index] = newTerm;
   } else {
     terms.push(newTerm);
   }
-
-  saveToLocalStorage();
+  saveToLocal();
   closeModal();
   filterTable();
 }
 
 function deleteTerm(id) {
-  if (confirm('确定要删除这条记录吗？')) {
+  if (confirm('确定删除此条记录？')) {
     terms = terms.filter(t => t.id !== id);
-    saveToLocalStorage();
+    saveToLocal();
     filterTable();
   }
 }
@@ -339,26 +394,26 @@ function closeModal() {
 }
 
 // ==================== 本地存储 ====================
-function saveToLocalStorage() {
-  localStorage.setItem('security_terms_100', JSON.stringify(terms));
+function saveToLocal() {
+  localStorage.setItem('security_terms_v2', JSON.stringify(terms));
 }
 
-function loadFromLocalStorage() {
-  const saved = localStorage.getItem('security_terms_100');
+function loadFromLocal() {
+  const saved = localStorage.getItem('security_terms_v2');
   if (saved) terms = JSON.parse(saved);
   renderTable(terms);
 }
 
-// ==================== CSV 导入导出 ====================
+// ==================== CSV ====================
 function exportCSV() {
   let csv = "类别,序号,中文意义,斯瓦希里语/参考词,推荐音译\n";
   terms.forEach(t => {
     csv += `"\( {t.cat}", \){t.num},"\( {t.cn}"," \){t.sw}","${t.py}"\n`;
   });
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
-  link.download = `安全指挥术语_完整版_${new Date().toISOString().slice(0,10)}.csv`;
+  link.download = `安全指挥术语_${new Date().toISOString().slice(0,10)}.csv`;
   link.click();
 }
 
@@ -366,12 +421,11 @@ function importCSV(e) {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = function(event) {
-    const text = event.target.result;
-    const rows = text.split('\n');
+  reader.onload = function(ev) {
+    const rows = ev.target.result.split('\n');
     rows.slice(1).forEach(row => {
       if (!row.trim()) return;
-      const cols = row.split(',').map(c => c.replace(/^"|"$/g, '').trim());
+      const cols = row.split(',').map(c => c.replace(/"/g,'').trim());
       if (cols.length >= 5) {
         terms.push({
           id: Date.now() + Math.random(),
@@ -383,28 +437,16 @@ function importCSV(e) {
         });
       }
     });
-    saveToLocalStorage();
+    saveToLocal();
     filterTable();
-    alert('✅ CSV 导入成功！');
+    alert('导入成功！');
   };
   reader.readAsText(file);
 }
 
-// ==================== 夜视模式 ====================
-let nightVision = false;
-function toggleNightVision() {
-  nightVision = !nightVision;
-  if (nightVision) {
-    document.body.classList.add('night-vision', 'matrix-bg');
-    document.getElementById('nightBtn').innerHTML = '🌙 关闭夜视';
-  } else {
-    document.body.classList.remove('night-vision', 'matrix-bg');
-    document.getElementById('nightBtn').innerHTML = '🌙 夜视模式 ON';
-  }
-}
-
 // ==================== 初始化 ====================
-loadFromLocalStorage();
+loadFromLocal();
+setTheme(0);
 </script>
 </body>
 </html>
