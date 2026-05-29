@@ -14,7 +14,7 @@
     .night-vision input, .night-vision select, .night-vision button { background-color: #002200; color: #00ff41; border-color: #00ff41; }
     .matrix-bg { background-image: linear-gradient(rgba(0,255,65,0.06) 1px,transparent 1px), linear-gradient(90deg,rgba(0,255,65,0.06) 1px,transparent 1px); background-size: 25px 25px; }
     .card-hover { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-    .card-hover:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); }
+    .card-hover:hover { transform: translateY(-3px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); }
     th { position: sticky; top: 0; z-index: 10; }
     .modal { animation: modalPop 0.3s ease; }
     @keyframes modalPop { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
@@ -29,10 +29,10 @@
       <i class="fas fa-shield-alt"></i> 海外安全官指挥术语系统
     </h1>
     <div class="flex items-center gap-3">
-      <button onclick="startExam()" class="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-2xl flex items-center gap-2 font-medium">
+      <button onclick="startExam()" class="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-2xl flex items-center gap-2 font-medium card-hover">
         <i class="fas fa-graduation-cap"></i> 开始考试
       </button>
-      <button onclick="toggleSettings()" class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-2xl flex items-center gap-2">
+      <button onclick="toggleSettings()" class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-2xl flex items-center gap-2 card-hover">
         <i class="fas fa-cog"></i>
       </button>
     </div>
@@ -57,11 +57,11 @@
           <button onclick="switchLang('en')" class="flex-1 py-4 rounded-2xl border">English</button>
         </div>
       </div>
-      <button onclick="fakeCloudSync()" class="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl flex items-center justify-center gap-2">
-        <i class="fas fa-cloud-upload-alt"></i> 云同步
+      <button onclick="fakeCloudSync()" class="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl flex items-center justify-center gap-2 card-hover">
+        <i class="fas fa-cloud-upload-alt"></i> 云同步（演示）
       </button>
     </div>
-    <button onclick="toggleSettings()" class="mt-8 w-full py-4 text-red-500 hover:bg-red-50 rounded-2xl">关闭</button>
+    <button onclick="toggleSettings()" class="mt-8 w-full py-4 text-red-500 hover:bg-red-50 rounded-2xl">关闭设置</button>
   </div>
 
   <!-- 工具栏 -->
@@ -80,16 +80,16 @@
     </select>
 
     <div class="flex gap-3">
-      <button onclick="showAddModal()" class="px-6 py-4 bg-green-600 hover:bg-green-700 text-white rounded-2xl flex items-center gap-2 shadow-sm">
+      <button onclick="showAddModal()" class="px-6 py-4 bg-green-600 hover:bg-green-700 text-white rounded-2xl flex items-center gap-2 card-hover">
         <i class="fas fa-plus"></i> 新增
       </button>
-      <button onclick="exportCSV()" class="px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl flex items-center gap-2">导出</button>
-      <button onclick="document.getElementById('importFile').click()" class="px-6 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl flex items-center gap-2">导入</button>
+      <button onclick="exportCSV()" class="px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl flex items-center gap-2 card-hover">导出CSV</button>
+      <button onclick="document.getElementById('importFile').click()" class="px-6 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl flex items-center gap-2 card-hover">导入CSV</button>
       <input type="file" id="importFile" accept=".csv" class="hidden" onchange="importCSV(event)">
     </div>
   </div>
 
-  <!-- 优化后的表格 -->
+  <!-- 表格 -->
   <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow overflow-hidden">
     <table class="w-full" id="dataTable">
       <thead class="bg-zinc-100 dark:bg-zinc-800">
@@ -107,19 +107,19 @@
   </div>
 </div>
 
-<!-- 考试模态框 -->
+<!-- 考试界面 -->
 <div id="examModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100]">
-  <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-2xl mx-4 shadow-2xl">
-    <div class="p-6 border-b flex justify-between items-center">
+  <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-2xl mx-4 shadow-2xl overflow-hidden">
+    <div class="p-6 border-b flex justify-between items-center bg-zinc-50 dark:bg-zinc-800">
       <h2 class="text-2xl font-bold">指挥术语考试</h2>
       <div class="flex items-center gap-6">
         <span id="examScore" class="font-mono text-2xl font-semibold text-green-600">0分</span>
         <span id="examProgress" class="font-mono text-lg">1/10</span>
       </div>
     </div>
-    <div class="p-10" id="examContent"></div>
+    <div class="p-10 min-h-[320px]" id="examContent"></div>
     <div class="p-6 border-t flex gap-4">
-      <button onclick="exitExam()" class="flex-1 py-5 border rounded-2xl">退出</button>
+      <button onclick="exitExam()" class="flex-1 py-5 border rounded-2xl hover:bg-gray-100">退出考试</button>
       <button onclick="nextQuestion()" id="nextBtn" class="flex-1 py-5 bg-green-600 text-white rounded-2xl">下一题</button>
     </div>
   </div>
@@ -131,13 +131,13 @@
     <h2 id="modalTitle" class="text-2xl font-bold mb-6">新增术语</h2>
     <input type="hidden" id="editId">
     <div class="space-y-6">
-      <div><label class="block text-sm mb-2">类别</label><input id="catInput" type="text" class="w-full px-6 py-4 border rounded-2xl"></div>
+      <div><label class="block text-sm mb-2 font-medium">类别</label><input id="catInput" type="text" class="w-full px-6 py-4 border rounded-2xl focus:border-green-500"></div>
       <div class="grid grid-cols-2 gap-6">
-        <div><label class="block text-sm mb-2">序号</label><input id="numInput" type="number" class="w-full px-6 py-4 border rounded-2xl"></div>
-        <div><label class="block text-sm mb-2">中文意义</label><input id="cnInput" type="text" class="w-full px-6 py-4 border rounded-2xl"></div>
+        <div><label class="block text-sm mb-2 font-medium">序号</label><input id="numInput" type="number" class="w-full px-6 py-4 border rounded-2xl"></div>
+        <div><label class="block text-sm mb-2 font-medium">中文意义</label><input id="cnInput" type="text" class="w-full px-6 py-4 border rounded-2xl"></div>
       </div>
-      <div><label class="block text-sm mb-2">斯瓦希里语/参考</label><input id="swInput" type="text" class="w-full px-6 py-4 border rounded-2xl"></div>
-      <div><label class="block text-sm mb-2">推荐音译</label><input id="pyInput" type="text" class="w-full px-6 py-4 border rounded-2xl"></div>
+      <div><label class="block text-sm mb-2 font-medium">斯瓦希里语/参考词</label><input id="swInput" type="text" class="w-full px-6 py-4 border rounded-2xl"></div>
+      <div><label class="block text-sm mb-2 font-medium">推荐音译</label><input id="pyInput" type="text" class="w-full px-6 py-4 border rounded-2xl"></div>
     </div>
     <div class="flex gap-4 mt-10">
       <button onclick="saveTerm()" class="flex-1 py-5 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-medium">保存</button>
@@ -251,10 +251,264 @@ let terms = [
   {id:100, cat:"六、协调与日常", num:100, cn:"看看/检查", sw:"Angalia", py:"安格利亚"}
 ];
 
-// 其余所有功能（主题、语言、考试、CRUD、CSV等）与上一版本完全一致，已全部包含
-// 为避免响应过长，此处省略重复代码部分，但实际部署时请使用完整代码
+// ==================== 全局变量 ====================
+let currentLang = 'zh';
+let currentTheme = 0;
+let examQuestions = [];
+let currentExamIndex = 0;
+let examScore = 0;
 
-// 初始化
+// ==================== 多语言 ====================
+const translations = {
+  zh: { title: "海外安全官指挥术语系统", search: "🔍 搜索 中文 / 音译 / 斯瓦希里语..." },
+  en: { title: "Overseas Security Command Terminology System", search: "🔍 Search Chinese / Transliteration..." }
+};
+
+function switchLang(lang) {
+  currentLang = lang;
+  document.getElementById('appTitle').textContent = translations[lang].title;
+  document.getElementById('searchInput').placeholder = translations[lang].search;
+}
+
+// ==================== 主题切换 ====================
+function setTheme(theme) {
+  currentTheme = theme;
+  document.body.classList.remove('dark', 'night-vision', 'matrix-bg');
+  if (theme === 1) document.body.classList.add('dark');
+  if (theme === 2) document.body.classList.add('night-vision', 'matrix-bg');
+}
+
+function toggleNightVision() {
+  setTheme(currentTheme === 2 ? 0 : 2);
+}
+
+// ==================== 设置面板 ====================
+function toggleSettings() {
+  document.getElementById('settingsPanel').classList.toggle('hidden');
+}
+
+function fakeCloudSync() {
+  exportCSV();
+  alert('✅ 云同步演示完成！\n数据已导出为CSV文件。');
+}
+
+// ==================== 表格渲染 ====================
+function renderTable(data) {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  data.forEach(item => {
+    const tr = document.createElement('tr');
+    tr.className = 'card-hover hover:bg-green-50 dark:hover:bg-zinc-800';
+    tr.innerHTML = `
+      <td class="px-8 py-6">${item.cat}</td>
+      <td class="px-8 py-6 font-semibold">${item.num}</td>
+      <td class="px-8 py-6">${item.cn}</td>
+      <td class="px-8 py-6">${item.sw}</td>
+      <td class="px-8 py-6 font-medium text-green-600 dark:text-green-400">${item.py}</td>
+      <td class="px-8 py-6 text-center">
+        <button onclick="editTerm(${item.id})" class="text-blue-500 hover:text-blue-600 mx-2 text-xl"><i class="fas fa-edit"></i></button>
+        <button onclick="deleteTerm(${item.id})" class="text-red-500 hover:text-red-600 mx-2 text-xl"><i class="fas fa-trash"></i></button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ==================== 搜索筛选 ====================
+function filterTable() {
+  const search = document.getElementById('searchInput').value.toLowerCase().trim();
+  const category = document.getElementById('categoryFilter').value;
+  
+  let filtered = terms;
+  if (category) filtered = filtered.filter(t => t.cat === category);
+  if (search) {
+    filtered = filtered.filter(t => 
+      t.cn.toLowerCase().includes(search) ||
+      t.sw.toLowerCase().includes(search) ||
+      t.py.toLowerCase().includes(search)
+    );
+  }
+  renderTable(filtered);
+}
+
+// ==================== CRUD ====================
+function showAddModal() {
+  document.getElementById('modalTitle').textContent = '新增术语';
+  document.getElementById('editId').value = '';
+  document.getElementById('catInput').value = '';
+  document.getElementById('numInput').value = '';
+  document.getElementById('cnInput').value = '';
+  document.getElementById('swInput').value = '';
+  document.getElementById('pyInput').value = '';
+  document.getElementById('modal').classList.remove('hidden');
+}
+
+function editTerm(id) {
+  const term = terms.find(t => t.id === id);
+  if (!term) return;
+  document.getElementById('modalTitle').textContent = '编辑术语';
+  document.getElementById('editId').value = term.id;
+  document.getElementById('catInput').value = term.cat;
+  document.getElementById('numInput').value = term.num;
+  document.getElementById('cnInput').value = term.cn;
+  document.getElementById('swInput').value = term.sw;
+  document.getElementById('pyInput').value = term.py;
+  document.getElementById('modal').classList.remove('hidden');
+}
+
+function saveTerm() {
+  const id = document.getElementById('editId').value;
+  const newTerm = {
+    id: id ? parseInt(id) : Date.now(),
+    cat: document.getElementById('catInput').value.trim(),
+    num: parseInt(document.getElementById('numInput').value) || 0,
+    cn: document.getElementById('cnInput').value.trim(),
+    sw: document.getElementById('swInput').value.trim(),
+    py: document.getElementById('pyInput').value.trim()
+  };
+  if (id) {
+    const index = terms.findIndex(t => t.id === parseInt(id));
+    if (index !== -1) terms[index] = newTerm;
+  } else {
+    terms.push(newTerm);
+  }
+  saveToLocal();
+  closeModal();
+  filterTable();
+}
+
+function deleteTerm(id) {
+  if (confirm('确定要删除这条记录吗？')) {
+    terms = terms.filter(t => t.id !== id);
+    saveToLocal();
+    filterTable();
+  }
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.add('hidden');
+}
+
+// ==================== 本地存储 ====================
+function saveToLocal() {
+  localStorage.setItem('security_terms_v2', JSON.stringify(terms));
+}
+
+function loadFromLocal() {
+  const saved = localStorage.getItem('security_terms_v2');
+  if (saved) terms = JSON.parse(saved);
+  renderTable(terms);
+}
+
+// ==================== CSV ====================
+function exportCSV() {
+  let csv = "类别,序号,中文意义,斯瓦希里语/参考词,推荐音译\n";
+  terms.forEach(t => {
+    csv += `"\( {t.cat}", \){t.num},"\( {t.cn}"," \){t.sw}","${t.py}"\n`;
+  });
+  const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `安全指挥术语_${new Date().toISOString().slice(0,10)}.csv`;
+  link.click();
+}
+
+function importCSV(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const rows = ev.target.result.split('\n');
+    rows.slice(1).forEach(row => {
+      if (!row.trim()) return;
+      const cols = row.split(',').map(c => c.replace(/"/g, '').trim());
+      if (cols.length >= 5) {
+        terms.push({
+          id: Date.now() + Math.random(),
+          cat: cols[0],
+          num: parseInt(cols[1]) || 0,
+          cn: cols[2],
+          sw: cols[3],
+          py: cols[4]
+        });
+      }
+    });
+    saveToLocal();
+    filterTable();
+    alert('✅ CSV 导入成功！');
+  };
+  reader.readAsText(file);
+}
+
+// ==================== 考试功能 ====================
+function startExam() {
+  examQuestions = [...terms].sort(() => Math.random() - 0.5).slice(0, 10);
+  currentExamIndex = 0;
+  examScore = 0;
+  document.getElementById('examModal').classList.remove('hidden');
+  showExamQuestion();
+}
+
+function showExamQuestion() {
+  const q = examQuestions[currentExamIndex];
+  const html = `
+    <div>
+      <div class="text-sm text-gray-500 mb-2">第 ${currentExamIndex + 1} / 10 题</div>
+      <div class="text-xl font-medium mb-8 leading-relaxed">${q.cn}</div>
+      <input type="text" id="examAnswerInput" placeholder="请输入推荐音译..." 
+             class="w-full px-6 py-5 border rounded-2xl text-lg focus:border-green-500" 
+             onkeypress="if(event.key === 'Enter') submitExamAnswer()">
+    </div>
+  `;
+  document.getElementById('examContent').innerHTML = html;
+  document.getElementById('examProgress').textContent = `${currentExamIndex + 1}/10`;
+  document.getElementById('examScore').textContent = `${examScore}分`;
+  document.getElementById('examAnswerInput').focus();
+}
+
+function submitExamAnswer() {
+  const answer = document.getElementById('examAnswerInput').value.trim();
+  const correct = examQuestions[currentExamIndex].py;
+  if (answer.toLowerCase() === correct.toLowerCase()) {
+    examScore += 10;
+  }
+  document.getElementById('examScore').textContent = `${examScore}分`;
+  nextQuestion();
+}
+
+function nextQuestion() {
+  currentExamIndex++;
+  if (currentExamIndex >= 10) {
+    showExamResult();
+  } else {
+    showExamQuestion();
+  }
+}
+
+function showExamResult() {
+  const html = `
+    <div class="text-center py-12">
+      <h2 class="text-4xl font-bold mb-6">考试结束</h2>
+      <div class="text-7xl font-mono mb-6 text-green-600">${examScore} <span class="text-3xl">分</span></div>
+      <p class="text-2xl mb-8">${examScore >= 80 ? '🎉 优秀！' : examScore >= 60 ? '✅ 及格' : '⚠️ 需要加强练习'}</p>
+      <button onclick="restartExam()" class="px-10 py-4 bg-green-600 text-white rounded-2xl text-lg">重新考试</button>
+    </div>
+  `;
+  document.getElementById('examContent').innerHTML = html;
+}
+
+function restartExam() {
+  document.getElementById('examModal').classList.add('hidden');
+  startExam();
+}
+
+function exitExam() {
+  if (confirm('确定要退出考试吗？')) {
+    document.getElementById('examModal').classList.add('hidden');
+  }
+}
+
+// ==================== 初始化 ====================
 loadFromLocal();
 setTheme(0);
 </script>
