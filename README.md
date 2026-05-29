@@ -1,27 +1,22 @@
-```html
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>军警指挥 100 词手持辅助系统</title>
-    <!-- Tailwind CSS -->
+    <title>指挥 100 词智能战术 App v3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
                         tactical: {
-                            gold: '#D4AF37',
-                            olive: '#556B2F',
-                            dark: '#121820',
-                            card: '#1E2631',
-                            red: '#8B0000',
-                            redlight: '#FF4D4D'
+                            bg: '#0B0F17',
+                            card: '#121826',
+                            border: '#1E293B',
+                            accent: '#10B981', // 极光绿
+                            amber: '#F59E0B'
                         }
                     }
                 }
@@ -29,84 +24,79 @@
         }
     </script>
     <style>
-        /* 战术红光夜视模式特定样式 */
-        .night-vision {
-            background-color: #0d0202 !important;
-            color: #ff3333 !important;
-        }
-        .night-vision .tactical-card {
-            background-color: #1a0505 !important;
-            border-color: #550000 !important;
-            color: #ff5555 !important;
-        }
-        .night-vision button {
-            color: #ff3333 !important;
-            border-color: #880000 !important;
-        }
-        .night-vision input, .night-vision select {
-            background-color: #150202 !important;
-            color: #ff3333 !important;
-            border-color: #660000 !important;
-        }
-        .night-vision .highlight-text {
-            color: #ff9999 !important;
-        }
-        /* 隐藏滚动条但保留滚动功能 */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        /* 针对手机端触摸反馈的优化 */
-        .active-scale:active {
-            transform: scale(0.95);
-        }
+        body { background-color: #0B0F17; color: #E2E8F0; font-family: 'Inter', system-ui, sans-serif; }
+        .glass-header { background: rgba(18, 24, 38, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #1E293B; }
+        .glow-green { text-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+        .btn-tactical { transition: all 0.2s; border: 1px solid #1E293B; background: #161E2E; }
+        .btn-tactical:active { transform: scale(0.95); background: #1E293B; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .tab-active { background: #0891B2; color: white; border: none; box-shadow: 0 4px 12px rgba(8, 145, 178, 0.4); }
+        input::placeholder { color: #475569; }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200 select-none pb-16">
+<body class="pb-24">
 
-    <!-- 顶部导航栏 -->
-    <header class="sticky top-0 z-50 bg-slate-950 border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-md transition-colors duration-200" id="headerNav">
-        <div class="flex items-center space-x-2">
-            <div class="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold shadow-lg shadow-emerald-900/40">
-                <i class="fa-solid fa-shield-halved"></i>
+    <!-- 顶部导航栏 (参考 1000017999.jpg) -->
+    <header class="sticky top-0 z-50 glass-header px-4 pt-4 pb-2">
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-slate-800 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+                    <i class="fa-solid fa-shield-halved text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight text-slate-100">指挥 100 词智能战术 App</h1>
+                    <p class="text-[10px] text-slate-500 font-mono tracking-widest uppercase">Tactical Command Dictionary v3.0</p>
+                </div>
             </div>
-            <div>
-                <h1 class="text-sm font-bold tracking-wider text-emerald-400">军警东非指挥系统</h1>
-                <p class="text-[10px] text-slate-400">斯瓦希里语/战术100词</p>
-            </div>
+            <button onclick="syncData()" class="w-10 h-10 rounded-full bg-emerald-950/30 border border-emerald-500/30 flex items-center justify-center text-emerald-500">
+                <i class="fa-solid fa-cloud-arrow-down"></i>
+            </button>
         </div>
-        
-        <div class="flex items-center space-x-2">
-            <!-- 战术红光夜视切换 -->
-            <button onclick="toggleNightVision()" class="w-10 h-10 rounded-full border border-slate-700 bg-slate-800/80 flex items-center justify-center active-scale text-slate-300" title="夜视模式">
-                <i class="fa-solid fa-eye-low-beam text-sm text-red-500"></i>
+
+        <!-- 顶部功能按钮 -->
+        <div class="grid grid-cols-2 gap-3 mb-4">
+            <button onclick="exportExcel()" class="btn-tactical py-2 rounded-lg text-xs font-semibold text-emerald-400 flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-file-export"></i>
+                <span>导出 Excel</span>
             </button>
-            <!-- 听写测试按钮 -->
-            <button onclick="openQuiz()" class="px-3 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-xs font-semibold flex items-center space-x-1 active-scale shadow-md shadow-emerald-950/50">
-                <i class="fa-solid fa-graduation-cap"></i>
-                <span>测验</span>
+            <button onclick="showAddModal()" class="btn-tactical py-2 rounded-lg text-xs font-semibold text-cyan-400 flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-plus-circle"></i>
+                <span>录入新指令</span>
             </button>
+        </div>
+
+        <!-- 分类选项卡 -->
+        <div class="flex space-x-2 overflow-x-auto no-scrollbar pb-2" id="categoryTabs">
+            <!-- 动态渲染 -->
         </div>
     </header>
 
-    <!-- 主容器 -->
-    <main class="flex-1 p-3 max-w-md mx-auto w-full space-y-4" id="mainContent">
-        
-        <!-- 便捷搜索与分类过滤 -->
-        <section class="bg-slate-850 p-3 rounded-xl border border-slate-800 shadow-sm space-y-3" id="filterArea">
-            <div class="relative">
-                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
-                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
-                </span>
-                <input type="text" id="searchInput" oninput="handleSearch()" placeholder="搜索中文/外文/音译/拼音..." class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2 pl-9 pr-8 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-100 placeholder-slate-500">
-                <button onclick="clearSearch()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-circle-xmark text-xs"></i>
-                </button>
-            </div>
+    <!-- 搜索与统计 -->
+    <div class="px-4 py-3">
+        <div class="relative group">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+            <input type="text" id="searchInput" oninput="filterWords()" placeholder="快速检索战术意义或拟音..." 
+                   class="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-cyan-500/50 transition-all">
+        </div>
+    </div>
 
-            <!-- 分类滑动轴（针对手机横向滑动优化） -->
-            <div class="flex space-x-1.5 overflow-x-auto no-scrollbar py-1">
-                <button onclick="filterCategory('all')" id="cat-all" class="category-btn px-3 py-1.5 rounded-full text-[11px] font-medium bg-emerald-600 text-white whitespace-nowrap sh
+    <!-- 核心列表区 -->
+    <main class="px-4 space-y-3" id="wordContainer">
+        <!-- 动态生成战术卡片 -->
+    </main>
+
+    <!-- 底部状态栏 (参考 1000017999.jpg) -->
+    <footer class="fixed bottom-0 left-0 right-0 bg-slate-950/90 backdrop-blur-md border-t border-slate-800 px-4 py-3 z-40">
+        <div class="flex items-center justify-between text-[11px]">
+            <div class="flex items-center space-x-2">
+                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10B981]"></div>
+                <span class="text-slate-400">已启用离线持久保存技术</span>
+            </div>
+            <div class="text-slate-500">
+                筛选结果: <span class="text-cyan-400 font-bold font-mono" id="resultCount">100</span> 项
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <p class="text-[10px] text-slate-600 font-medium">维和安保航战术精简版 App 系统</p>
+            <p class="text-[9px] text-slate-700 font-mono">APP ID: military_swahili_pwa_system</p>
+  
