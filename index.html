@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>海外安全官指挥术语系统 v2.5</title>
+  <title>海外安全官指挥术语系统 v2.6</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
@@ -13,9 +13,10 @@
     .matrix-bg { background-image: linear-gradient(rgba(0,255,65,0.06) 1px,transparent 1px), linear-gradient(90deg,rgba(0,255,65,0.06) 1px,transparent 1px); background-size: 25px 25px; }
     .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     table { min-width: 1200px; }
+    .category-header { background-color: #f3f4f6; font-weight: bold; }
+    .dark .category-header { background-color: #27272a; color: #a1a1aa; }
     @media (max-width: 768px) {
       th, td { padding: 12px 6px; font-size: 14px; }
-      .table-container { margin: 0 -16px; padding: 0 16px; }
     }
   </style>
 </head>
@@ -74,7 +75,7 @@
       <option value="六、协调与日常">六、协调与日常</option>
     </select>
     <div class="flex gap-3">
-      <button onclick="showAddModal()" class="px-6 py-4 bg-green-600 hover:bg-green-700 text-white rounded-2xl flex items-center gap-2">新增</button>
+      <button onclick="showAddModal()" class="px-6 py-4 bg-green-600 hover:bg-green-700 text-white rounded-2xl">新增</button>
       <button onclick="exportCSV()" class="px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl">导出</button>
       <button onclick="document.getElementById('importFile').click()" class="px-6 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl">导入</button>
       <input type="file" id="importFile" accept=".csv" class="hidden" onchange="importCSV(event)">
@@ -85,18 +86,18 @@
   <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow overflow-hidden">
     <div class="table-container">
       <table class="w-full" id="dataTable">
-        <thead class="bg-zinc-100 dark:bg-zinc-800">
+        <thead class="bg-zinc-100 dark:bg-zinc-800 sticky top-0">
           <tr>
-            <th class="px-6 py-5 text-left">类别</th>
-            <th class="px-6 py-5 text-left">序号</th>
+            <th class="px-6 py-5 text-left w-48">类别</th>
+            <th class="px-6 py-5 text-left w-16">序号</th>
             <th class="px-6 py-5 text-left">中文意义</th>
             <th class="px-6 py-5 text-left">斯瓦希里语/参考</th>
             <th class="px-6 py-5 text-left">推荐音译</th>
-            <th class="px-6 py-5 text-center">语音</th>
+            <th class="px-6 py-5 text-center w-16">语音</th>
             <th class="px-6 py-5 text-center w-24">操作</th>
           </tr>
         </thead>
-        <tbody id="tableBody" class="divide-y divide-gray-100 dark:divide-zinc-700"></tbody>
+        <tbody id="tableBody" class="divide-y"></tbody>
       </table>
     </div>
   </div>
@@ -142,7 +143,7 @@
 </div>
 
 <script>
-// ==================== 完整 100 条数据 ====================
+// ==================== 完整100条数据 ====================
 let terms = [
   {id:1, cat:"一、指挥与身份", num:1, cn:"领导/首长", sw:"Boss", py:"波丝"},
   {id:2, cat:"一、指挥与身份", num:2, cn:"警察", sw:"Polisi", py:"波利斯"},
@@ -259,7 +260,6 @@ function speak(text) {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'zh-CN';
     utterance.rate = 0.95;
-    utterance.pitch = 1.05;
     speechSynthesis.cancel();
     speechSynthesis.speak(utterance);
   } else {
@@ -267,23 +267,37 @@ function speak(text) {
   }
 }
 
-// ==================== 表格渲染 ====================
+// ==================== 分组渲染表格（类别只显示一次） ====================
 function renderTable(data) {
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
-  data.forEach(item => {
+
+  const sorted = [...data].sort((a, b) => {
+    if (a.cat !== b.cat) return a.cat.localeCompare(b.cat);
+    return a.num - b.num;
+  });
+
+  let currentCategory = '';
+
+  sorted.forEach(item => {
+    if (item.cat !== currentCategory) {
+      const header = document.createElement('tr');
+      header.className = 'category-header';
+      header.innerHTML = `<td colspan="7" class="px-6 py-4">${item.cat}</td>`;
+      tbody.appendChild(header);
+      currentCategory = item.cat;
+    }
+
     const tr = document.createElement('tr');
     tr.className = 'hover:bg-green-50 dark:hover:bg-zinc-800';
     tr.innerHTML = `
-      <td class="px-6 py-5">${item.cat}</td>
+      <td class="px-6 py-5"></td>
       <td class="px-6 py-5 font-medium">${item.num}</td>
       <td class="px-6 py-5">${item.cn}</td>
       <td class="px-6 py-5">${item.sw}</td>
       <td class="px-6 py-5 font-medium text-green-600">${item.py}</td>
       <td class="px-6 py-5 text-center">
-        <button onclick="speak('${item.py}')" class="text-green-600 hover:text-green-700 text-xl px-2">
-          <i class="fas fa-volume-up"></i>
-        </button>
+        <button onclick="speak('${item.py}')" class="text-green-600 hover:text-green-700 text-xl"><i class="fas fa-volume-up"></i></button>
       </td>
       <td class="px-6 py-5 text-center">
         <button onclick="editTerm(${item.id})" class="text-blue-500 hover:text-blue-600 mx-1"><i class="fas fa-edit"></i></button>
@@ -380,10 +394,8 @@ function loadFromLocal() {
 
 function exportCSV() {
   let csv = "类别,序号,中文意义,斯瓦希里语/参考词,推荐音译\n";
-  terms.forEach(t => {
-    csv += `"\( {t.cat}", \){t.num},"\( {t.cn}"," \){t.sw}","${t.py}"\n`;
-  });
-  const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+  terms.forEach(t => csv += `"\( {t.cat}", \){t.num},"\( {t.cn}"," \){t.sw}","${t.py}"\n`);
+  const blob = new Blob([csv], {type: 'text/csv'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = '安全指挥术语.csv';
@@ -457,7 +469,7 @@ function exitExam() {
   if (confirm('确定退出考试？')) document.getElementById('examModal').classList.add('hidden');
 }
 
-// ==================== 主题 & 设置 ====================
+// ==================== 主题 ====================
 function setTheme(theme) {
   currentTheme = theme;
   document.body.classList.remove('dark', 'night-vision', 'matrix-bg');
