@@ -3,20 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>海外安全官指挥术语系统 v2.4</title>
+  <title>海外安全官指挥术语系统 v2.5</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
-    body { font-family: 'Microsoft YaHei', system-ui, sans-serif; }
+    body { font-family: 'Microsoft YaHei', system-ui, sans-serif; transition: all 0.3s; }
     .night-vision { background-color: #001a00 !important; color: #00ff41 !important; }
     .night-vision input, .night-vision select, .night-vision button { background-color: #002200; color: #00ff41; border-color: #00ff41; }
     .matrix-bg { background-image: linear-gradient(rgba(0,255,65,0.06) 1px,transparent 1px), linear-gradient(90deg,rgba(0,255,65,0.06) 1px,transparent 1px); background-size: 25px 25px; }
-    
     .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    table { min-width: 1100px; }
-    th, td { white-space: nowrap; }
+    table { min-width: 1200px; }
     @media (max-width: 768px) {
-      th, td { padding: 14px 8px; font-size: 14px; }
+      th, td { padding: 12px 6px; font-size: 14px; }
+      .table-container { margin: 0 -16px; padding: 0 16px; }
     }
   </style>
 </head>
@@ -44,8 +43,8 @@
       <div>
         <label class="block text-sm mb-3">主题模式</label>
         <div class="grid grid-cols-3 gap-3">
-          <button onclick="setTheme(0)" class="py-4 rounded-2xl border hover:bg-gray-100">☀️ 亮色</button>
-          <button onclick="setTheme(1)" class="py-4 rounded-2xl border hover:bg-gray-100">🌙 暗黑</button>
+          <button onclick="setTheme(0)" class="py-4 rounded-2xl border">☀️ 亮色</button>
+          <button onclick="setTheme(1)" class="py-4 rounded-2xl border">🌙 暗黑</button>
           <button onclick="setTheme(2)" class="py-4 rounded-2xl border bg-green-900 text-white">🌲 夜视</button>
         </div>
       </div>
@@ -82,7 +81,7 @@
     </div>
   </div>
 
-  <!-- 表格 - 已优化移动端 -->
+  <!-- 表格 -->
   <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow overflow-hidden">
     <div class="table-container">
       <table class="w-full" id="dataTable">
@@ -93,7 +92,8 @@
             <th class="px-6 py-5 text-left">中文意义</th>
             <th class="px-6 py-5 text-left">斯瓦希里语/参考</th>
             <th class="px-6 py-5 text-left">推荐音译</th>
-            <th class="px-6 py-5 text-center w-28">操作</th>
+            <th class="px-6 py-5 text-center">语音</th>
+            <th class="px-6 py-5 text-center w-24">操作</th>
           </tr>
         </thead>
         <tbody id="tableBody" class="divide-y divide-gray-100 dark:divide-zinc-700"></tbody>
@@ -253,29 +253,21 @@ let examQuestions = [];
 let currentExamIndex = 0;
 let examScore = 0;
 
-// ==================== 多语言 & 主题 ====================
-function switchLang(lang) {
-  currentLang = lang;
-  document.getElementById('appTitle').textContent = lang === 'zh' ? "海外安全官指挥术语系统" : "Overseas Security Command Terminology";
+// ==================== 语音朗读 ====================
+function speak(text) {
+  if ('speechSynthesis' in window) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'zh-CN';
+    utterance.rate = 0.95;
+    utterance.pitch = 1.05;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(utterance);
+  } else {
+    alert('您的浏览器不支持语音朗读');
+  }
 }
 
-function setTheme(theme) {
-  currentTheme = theme;
-  document.body.classList.remove('dark', 'night-vision', 'matrix-bg');
-  if (theme === 1) document.body.classList.add('dark');
-  if (theme === 2) document.body.classList.add('night-vision', 'matrix-bg');
-}
-
-function toggleSettings() {
-  document.getElementById('settingsPanel').classList.toggle('hidden');
-}
-
-function fakeCloudSync() {
-  exportCSV();
-  alert('✅ 云同步演示完成！');
-}
-
-// ==================== 表格 ====================
+// ==================== 表格渲染 ====================
 function renderTable(data) {
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
@@ -287,10 +279,15 @@ function renderTable(data) {
       <td class="px-6 py-5 font-medium">${item.num}</td>
       <td class="px-6 py-5">${item.cn}</td>
       <td class="px-6 py-5">${item.sw}</td>
-      <td class="px-6 py-5 font-medium text-green-600 dark:text-green-400">${item.py}</td>
+      <td class="px-6 py-5 font-medium text-green-600">${item.py}</td>
       <td class="px-6 py-5 text-center">
-        <button onclick="editTerm(${item.id})" class="text-blue-500 hover:text-blue-600 mx-2"><i class="fas fa-edit"></i></button>
-        <button onclick="deleteTerm(${item.id})" class="text-red-500 hover:text-red-600 mx-2"><i class="fas fa-trash"></i></button>
+        <button onclick="speak('${item.py}')" class="text-green-600 hover:text-green-700 text-xl px-2">
+          <i class="fas fa-volume-up"></i>
+        </button>
+      </td>
+      <td class="px-6 py-5 text-center">
+        <button onclick="editTerm(${item.id})" class="text-blue-500 hover:text-blue-600 mx-1"><i class="fas fa-edit"></i></button>
+        <button onclick="deleteTerm(${item.id})" class="text-red-500 hover:text-red-600 mx-1"><i class="fas fa-trash"></i></button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -304,9 +301,9 @@ function filterTable() {
   if (category) filtered = filtered.filter(t => t.cat === category);
   if (search) {
     filtered = filtered.filter(t => 
-      (t.cn && t.cn.toLowerCase().includes(search)) || 
-      (t.sw && t.sw.toLowerCase().includes(search)) || 
-      (t.py && t.py.toLowerCase().includes(search))
+      t.cn.toLowerCase().includes(search) || 
+      t.sw.toLowerCase().includes(search) || 
+      t.py.toLowerCase().includes(search)
     );
   }
   renderTable(filtered);
@@ -403,14 +400,7 @@ function importCSV(e) {
       if (!row.trim()) return;
       const cols = row.split(',').map(c => c.replace(/"/g,'').trim());
       if (cols.length >= 5) {
-        terms.push({
-          id: Date.now(),
-          cat: cols[0],
-          num: parseInt(cols[1]) || 0,
-          cn: cols[2],
-          sw: cols[3],
-          py: cols[4]
-        });
+        terms.push({id: Date.now(), cat: cols[0], num: parseInt(cols[1])||0, cn: cols[2], sw: cols[3], py: cols[4]});
       }
     });
     saveToLocal();
@@ -433,26 +423,19 @@ function showExamQuestion() {
   const q = examQuestions[currentExamIndex];
   document.getElementById('examContent').innerHTML = `
     <div class="text-xl font-medium mb-8">${q.cn}</div>
-    <input type="text" id="examAnswer" placeholder="输入推荐音译" class="w-full px-6 py-5 border rounded-2xl text-lg focus:border-green-500" autofocus>
+    <input type="text" id="examAnswer" placeholder="输入推荐音译" class="w-full px-6 py-5 border rounded-2xl text-lg" autofocus>
   `;
   document.getElementById('examProgress').textContent = `${currentExamIndex+1}/10`;
   document.getElementById('examScore').textContent = `${examScore}分`;
 }
 
 function submitExamAnswer() {
-  const answer = (document.getElementById('examAnswer') || {}).value || '';
-  if (!answer.trim()) {
-    alert('请输入答案');
-    return;
-  }
-  const correct = examQuestions[currentExamIndex].py;
-  if (answer.toLowerCase() === correct.toLowerCase()) examScore += 10;
+  const answer = document.getElementById('examAnswer').value.trim();
+  if (!answer) return alert('请输入答案');
+  if (answer.toLowerCase() === examQuestions[currentExamIndex].py.toLowerCase()) examScore += 10;
   currentExamIndex++;
-  if (currentExamIndex >= 10) {
-    showExamResult();
-  } else {
-    showExamQuestion();
-  }
+  if (currentExamIndex >= 10) showExamResult();
+  else showExamQuestion();
 }
 
 function showExamResult() {
@@ -460,7 +443,7 @@ function showExamResult() {
     <div class="text-center py-12">
       <h2 class="text-4xl font-bold mb-4">考试结束</h2>
       <p class="text-7xl font-bold text-green-600 mb-6">${examScore}分</p>
-      <button onclick="restartExam()" class="px-10 py-4 bg-green-600 text-white rounded-2xl text-lg">重新考试</button>
+      <button onclick="restartExam()" class="px-10 py-4 bg-green-600 text-white rounded-2xl">重新考试</button>
     </div>
   `;
 }
@@ -471,7 +454,24 @@ function restartExam() {
 }
 
 function exitExam() {
-  if (confirm('确定退出考试吗？')) document.getElementById('examModal').classList.add('hidden');
+  if (confirm('确定退出考试？')) document.getElementById('examModal').classList.add('hidden');
+}
+
+// ==================== 主题 & 设置 ====================
+function setTheme(theme) {
+  currentTheme = theme;
+  document.body.classList.remove('dark', 'night-vision', 'matrix-bg');
+  if (theme === 1) document.body.classList.add('dark');
+  if (theme === 2) document.body.classList.add('night-vision', 'matrix-bg');
+}
+
+function toggleSettings() {
+  document.getElementById('settingsPanel').classList.toggle('hidden');
+}
+
+function fakeCloudSync() {
+  exportCSV();
+  alert('✅ 云同步演示完成');
 }
 
 // ==================== 初始化 ====================
