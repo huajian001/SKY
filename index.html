@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>指挥 100 词智能战术 App</title>
+    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIuWMh+aMpeS4gOeZvuiorSDmmbrog73miJjmnK8gQXBwIiwKICAic2hvcnRfbmFtZSI6ICLmiJjmnK8xMDDnor0iLAogICJzdGFydF91cmwiOiAiaW5kZXguaHRtbCIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzBCOEYxNyIsCiAgInRoZW1lX2NvbG9yIjogIiMwQjhGMTciLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL2Nkbi1pY29ucy1wbmcuZmxhdGljb24uY29tLzUxMi8yNTYxLzI1NjEzNzQucG5nIiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgICB9CiAgXQp9">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        tactical: { bg: '#0B0F17', card: '#121826', border: '#1E293B', accent: '#10B981', amber: '#F59E0B' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0B0F17; color: #E2E8F0; font-family: system-ui, -apple-system, sans-serif; user-select: none; }
+        .glass-header { background: rgba(18, 24, 38, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #1E293B; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .tab-active { background: #0891B2; color: white; border: none; box-shadow: 0 4px 12px rgba(8, 145, 178, 0.4); }
+        .night-vision { background-color: #0d0202 !important; color: #ff3333 !important; }
+        .night-vision .tactical-card { background-color: #1a0505 !important; border-color: #550000 !important; color: #ff5555 !important; }
+        .night-vision button { color: #ff3333 !important; border-color: #880000 !important; }
+        .night-vision input, .night-vision select { background-color: #150202 !important; color: #ff3333 !important; border-color: #660000 !important; }
+        .night-vision .highlight-text { color: #ff9999 !important; }
+        .quiz-opt-btn { transition: all 0.2s; }
+    </style>
+</head>
+<body class="pb-32">
+
+    <header class="sticky top-0 z-50 glass-header px-4 pt-4 pb-2" id="headerNav">
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-slate-800 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+                    <i class="fa-solid fa-shield-halved text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-base font-bold tracking-tight text-slate-100">指挥 100 词智能战术 App</h1>
+                    <p class="text-[9px] text-slate-500 font-mono tracking-widest uppercase">Tactical Command Dictionary v3.0</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="toggleNightVision()" class="w-10 h-10 rounded-full border border-slate-700 bg-slate-800/80 flex items-center justify-center active:scale-95 text-slate-300">
+                    <i class="fa-solid fa-eye-low-beam text-sm text-red-500"></i>
+                </button>
+                <button onclick="openQuiz()" class="px-3 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-xs font-semibold flex items-center space-x-1 active:scale-95 shadow-md shadow-emerald-950/50">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>测验</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mb-4">
+            <button onclick="exportExcel()" class="btn-tactical py-2.5 rounded-lg text-xs font-semibold text-emerald-400 flex items-center justify-center space-x-2 bg-slate-900 border-slate-800">
+                <i class="fa-solid fa-file-export"></i>
+                <span>导出 Excel</span>
+            </button>
+            <button onclick="showAddModal()" class="btn-tactical py-2.5 rounded-lg text-xs font-semibold text-cyan-400 flex items-center justify-center space-x-2 bg-slate-900 border-slate-800">
+                <i class="fa-solid fa-plus-circle"></i>
+                <span>录入新指令</span>
+            </button>
+        </div>
+
+        <div class="flex space-x-2 overflow-x-auto no-scrollbar pb-2" id="categoryTabs"></div>
+    </header>
+
+    <div class="px-4 py-3">
+        <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+            <input type="text" id="searchInput" oninput="filterWords()" placeholder="快速检索战术意义、拼音或音译..." 
+                   class="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-xs focus:outline-none focus:border-cyan-500/50 transition-all text-slate-100">
+        </div>
+    </div>
+
+    <main class="px-4 space-y-3" id="wordContainer"></main>
+
+    <footer class="fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-md border-t border-slate-800 px-4 py-3.5 z-40">
+        <div class="flex items-center justify-between text-[11px] max-w-md mx-auto">
+            <div class="flex items-center space-x-2">
+                <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10B981]"></div>
+                <span class="text-slate-400 font-medium">已启用离线持久保存技术</span>
+            </div>
+            <div class="text-slate-400">筛选结果: <span class="text-cyan-400 font-bold font-mono" id="resultCount">100</span> 项</div>
+        </div>
+    </footer>
+
+    <div id="addModal" class="fixed inset-0 z-[60] hidden flex items-center justify-center px-6">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="hideAddModal()"></div>
+        <div class="relative w-full max-w-sm bg-slate-900 border border-slate-700 rounded-2xl p-6 shadow-2xl">
+            <h3 class="text-base font-bold text-cyan-400 mb-4"><i class="fa-solid fa-pen-to-square mr-2"></i> 录入实战新词汇</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] text-slate-500 uppercase font-bold">所属大类</label>
+                    <select id="newCat" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-xs mt-1 text-slate-200">
+                        <option value="一、指挥与身份">一、指挥与身份</option>
+                        <option value="二、行动指令" selected>二、行动指令</option>
+                        <option value="三、战术方位">三、战术方位</option>
+                        <option value="四、装备与资源">四、装备与资源</option>
+                        <option value="五、应急与状态">五、应急与状态</option>
+                        <option value="六、协调与日常">六、协调与日常</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] text-slate-500 uppercase font-bold">中文战术意义</label>
+                    <input type="text" id="newZh" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-xs mt-1 text-slate-200">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-[10px] text-slate-500 uppercase font-bold">外文参考</label>
+                        <input type="text" id="newSwa" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-xs mt-1 text-slate-200">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-500 uppercase font-bold">推荐拟音</label>
+                        <input type="text" id="newPinyin" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-xs mt-1 text-slate-200">
+                    </div>
+                </div>
+                <button onclick="saveNewWord()" class="w-full bg-cyan-600 text-white font-bold py-3 rounded-xl mt-2 text-xs">确认存入持久化数据库</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="flashModal" class="fixed inset-0 bg-black z-50 hidden flex-col justify-between p-6 text-center" onclick="closeFlashScreen()">
+        <div class="flex justify-between items-center">
+            <span class="text-red-500 font-bold text-xs tracking-widest"><i class="fa-solid fa-bullhorn animate-pulse"></i> TACTICAL SIGNAL</span>
+            <span class="text-slate-500 text-xs">点击屏幕关闭</span>
+        </div>
+        <div class="my-auto space-y-8">
+            <div class="text-[52px] font-black text-amber-400" id="flashZh">别动</div>
+            <div class="space-y-2">
+                <div class="text-[44px] font-extrabold text-white" id="flashSwa">Guigala</div>
+                <div class="text-lg text-slate-400">发音：<span class="text-emerald-400 font-bold" id="flashPinyin">规嘎拉</span></div>
+            </div>
+        </div>
+        <div class="text-xs text-slate-500">向管控对象直接出示手机画面进行战术威慑</div>
+    </div>
+
+    <div id="quizModal" class="fixed inset-0 bg-slate-950 z-50 hidden flex flex-col p-4 max-w-md mx-auto">
+        <header class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <span class="text-emerald-400 font-bold"><i class="fa-solid fa-graduation-cap"></i> 指挥官测试 (<span id="quizProgress">1/10</span>)</span>
+            <button onclick="closeQuiz()" class="text-slate-400 text-sm"><i class="fa-solid fa-xmark"></i></button>
+        </header>
+        <main class="flex-1 flex flex-col justify-between py-6">
+            <div class="space-y-4">
+                <div class="text-right text-xs text-slate-400">得分: <strong class="text-emerald-400" id="quizScore">0</strong></div>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center">
+                    <div class="text-3xl font-bold text-white mb-2" id="quizQuestionWord">Simama</div>
+                    <div class="text-sm text-slate-400">拟音：<span class="text-emerald-400 font-semibold" id="quizQuestionPinyin">西马马</span></div>
+                </div>
+            </div>
+            <div class="space-y-2.5" id="quizOptionsContainer"></div>
+            <button id="quizNextBtn" disabled onclick="nextQuiz()" class="w-full py-3.5 rounded-xl bg-slate-800 text-slate-500 text-xs font-bold transition-all">请选择正确答案</button>
+        </main>
+    </div>
+
+    <div id="alertBox" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-slate-900 border border-cyan-500/30 text-cyan-400 px-4 py-2.5 rounded-xl text-xs flex items-center space-x-2 opacity-0 pointer-events-none transition-all z-50">
+        <i class="fa-solid fa-circle-check"></i><span id="alertMessage"></span>
+    </div>
+
+    <script>
+        const defaultWords = [
+            { id: 1, cat: "一、指挥与身份", zh: "领导/首长", swa: "Boss", py: "波丝" },
+            { id: 2, cat: "一、指挥与身份", zh: "警察", swa: "Polisi", py: "波利斯" },
+            { id: 3, cat: "一、指挥与身份", zh: "军人", swa: "Soldat", py: "索哒" },
+            { id: 4, cat: "一、指挥与身份", zh: "保安", swa: "Shei", py: "谢义" },
+            { id: 5, cat: "一、指挥与身份", zh: "我", swa: "Miye", py: "米也" },
+            { id: 6, cat: "一、指挥与身份", zh: "你", swa: "Wei", py: "微" },
+            { id: 7, cat: "一、指挥与身份", zh: "他", swa: "Wuyou", py: "无有" },
+            { id: 8, cat: "一、指挥与身份", zh: "刚果人", swa: "Congoli", py: "刚果里" },
+            { id: 9, cat: "一、指挥与身份", zh: "外国人", swa: "Bazungu", py: "巴容古" },
+            { id: 10, cat: "一、指挥与身份", zh: "姓名", swa: "Nom", py: "农" },
+            { id: 11, cat: "一、指挥与身份", zh: "身份证", swa: "ID", py: "埃迪" },
+            { id: 12, cat: "一、指挥与身份", zh: "护照", swa: "Passeport", py: "帕斯报特" },
+            { id: 13, cat: "一、指挥与身份", zh: "签字", swa: "Signer", py: "新艳" },
+            { id: 14, cat: "一、指挥与身份", zh: "盖章", swa: "Cachet", py: "嘎谢" },
+            { id: 15, cat: "一、指挥与身份", zh: "组织/团伙", swa: "Group", py: "古鲁普" },
+            { id: 16, cat: "二、行动指令", zh: "过来", swa: "Guya", py: "古雅" },
+            { id: 17, cat: "二、行动指令", zh: "走/离开", swa: "Dembia", py: "点必亚" },
+            { id: 18, cat: "二、行动指令", zh: "停止/站住", swa: "Simama", py: "西马马" },
+            { id: 19, cat: "二、行动指令", zh: "别动", swa: "Guigala", py: "规嘎拉" },
+            { id: 20, cat: "二、行动指令", zh: "坐下", swa: "Igara", py: "以嘎拉" },
+            { id: 21, cat: "二、行动指令", zh: "起来", swa: "Selewei", py: "塞来为" },
+            { id: 22, cat: "二、行动指令", zh: "进去", swa: "Gunjia", py: "滚几亚" },
+            { id: 23, cat: "二、行动指令", zh: "出来", swa: "Toka", py: "到嘎" },
+            { id: 24, cat: "二、行动指令", zh: "放下", swa: "Lebo/Wega", py: "来博" },
+            { id: 25, cat: "二、行动指令", zh: "拿起/提着", swa: "Beba", py: "贝巴" },
+            { id: 26, cat: "二、行动指令", zh: "快点", swa: "Fast", py: "法斯特" },
+            { id: 27, cat: "二、行动指令", zh: "慢点", swa: "Bolebole", py: "波累波累" },
+            { id: 28, cat: "二、行动指令", zh: "等一下", swa: "Adang", py: "阿当" },
+            { id: 29, cat: "二、行动指令", zh: "集合", swa: "Pode", py: "抱得" },
+            { id: 30, cat: "二、行动指令", zh: "跟着", swa: "Gogoda", py: "过过大" },
+            { id: 31, cat: "二、行动指令", zh: "返回", swa: "Revenir", py: "雷维尼尔" },
+            { id: 32, cat: "二、行动指令", zh: "回去", swa: "Retourner", py: "雷度尔内" },
+            { id: 33, cat: "二、行动指令", zh: "寻找/搜查", swa: "Dafuta", py: "达扶答" },
+            { id: 34, cat: "二、行动指令", zh: "抓捕", swa: "Gubamba", py: "古邦巴" },
+            { id: 35, cat: "二、行动指令", zh: "蹲下", swa: "Shusa", py: "羞莎" },
+            { id: 36, cat: "三、战术方位", zh: "前面", swa: "Mbele", py: "工贝里" },
+            { id: 37, cat: "三、战术方位", zh: "后面", swa: "Mugongo", py: "莫刚哥" },
+            { id: 38, cat: "三、战术方位", zh: "左边", swa: "Goshi", py: "果西" },
+            { id: 39, cat: "三、战术方位", zh: "右边", swa: "Tolashi", py: "托拉西" },
+            { id: 40, cat: "三、战术方位", zh: "上面", swa: "Yulu", py: "尤路" },
+            { id: 41, cat: "三、战术方位", zh: "下面", swa: "Jini", py: "基尼" },
+            { id: 42, cat: "三、战术方位", zh: "这里", swa: "Aba", py: "阿巴" },
+            { id: 43, cat: "三、战术方位", zh: "那里", swa: "Pale", py: "巴雷" },
+            { id: 44, cat: "三、战术方位", zh: "里面", swa: "Mangara", py: "忙嘎拉" },
+            { id: 45, cat: "三、战术方位", zh: "外面", swa: "Gera", py: "给拉" },
+            { id: 46, cat: "三、战术方位", zh: "中间", swa: "Gajigaji", py: "嘎几嘎急" },
+            { id: 47, cat: "三、战术方位", zh: "旁边", swa: "Gombe", py: "工贝" },
+            { id: 48, cat: "三、战术方位", zh: "北", swa: "North", py: "诺斯" },
+            { id: 49, cat: "三、战术方位", zh: "南", swa: "South", py: "色德" },
+            { id: 50, cat: "三、战术方位", zh: "东", swa: "East", py: "爱斯特" },
+            { id: 51, cat: "三、战术方位", zh: "西", swa: "West", py: "威斯特" },
+            { id: 52, cat: "三、战术方位", zh: "城市", swa: "Ville", py: "维勒" },
+            { id: 53, cat: "三、战术方位", zh: "马路", swa: "Balabala", py: "巴拉巴拉" },
+            { id: 54, cat: "三、战术方位", zh: "桥", swa: "Jilalou", py: "几拉漏" },
+            { id: 55, cat: "三、战术方位", zh: "围墙", swa: "Bida", py: "比达" },
+            { id: 56, cat: "四、装备与资源", zh: "步枪", swa: "Munonge", py: "布顿给" },
+            { id: 57, cat: "四、装备与资源", zh: "手枪/枪", swa: "Munduge", py: "木冬给" },
+            { id: 58, cat: "四、装备与资源", zh: "坦克", swa: "Shaletegomba", py: "夏雷得供巴" },
+            { id: 59, cat: "四、装备与资源", zh: "大炮", swa: "Bangmu", py: "帮木" },
+            { id: 60, cat: "四、装备与资源", zh: "汽车", swa: "Motoga", py: "莫道嘎" },
+            { id: 61, cat: "四、装备与资源", zh: "大卡车", swa: "Truck", py: "德拉克" },
+            { id: 62, cat: "四、装备与资源", zh: "摩托车", swa: "Dugudugu", py: "杜古杜古" },
+            { id: 63, cat: "四、装备与资源", zh: "对讲机", swa: "Bik", py: "比克" },
+            { id: 64, cat: "四、装备与资源", zh: "手机", swa: "Simu", py: "西姆" },
+            { id: 65, cat: "四、装备与资源", zh: "手电筒", swa: "Torch", py: "托奇" },
+            { id: 66, cat: "四、装备与资源", zh: "钥匙", swa: "Fungulu", py: "风古路" },
+            { id: 67, cat: "四、装备与资源", zh: "汽油", swa: "Essence", py: "艾桑斯" },
+            { id: 68, cat: "四、装备与资源", zh: "柴油", swa: "Mazout", py: "马如特" },
+            { id: 69, cat: "四、装备与资源", zh: "绳子", swa: "Gamba", py: "干巴" },
+            { id: 70, cat: "四、装备与资源", zh: "手铐", swa: "Geragang", py: "哥拉岗" },
+            { id: 71, cat: "四、装备与资源", zh: "灭火器", swa: "Extincteur", py: "艾斯丁特而" },
+            { id: 72, cat: "四、装备与资源", zh: "地图/计划", swa: "Plan", py: "普朗" },
+            { id: 73, cat: "四、装备与资源", zh: "哨子", swa: "Flimbi", py: "夫林比" },
+            { id: 74, cat: "四、装备与资源", zh: "信号", swa: "Lero", py: "雷若" },
+            { id: 75, cat: "四、装备与资源", zh: "电池", swa: "Batterie", py: "巴得里" },
+            { id: 76, cat: "五、应急与状态", zh: "注意/小心", swa: "Attention", py: "阿当雄" },
+            { id: 77, cat: "五、应急与状态", zh: "危险", swa: "Danger", py: "单杰" },
+            { id: 78, cat: "五、应急与状态", zh: "爆炸", swa: "Pasuga", py: "巴苏嘎" },
+            { id: 79, cat: "五、应急与状态", zh: "死亡", swa: "Gufa", py: "古发" },
+            { id: 80, cat: "五、应急与状态", zh: "受伤", swa: "Gilonda", py: "几龙答" },
+            { id: 81, cat: "五、应急与状态", zh: "流血", swa: "Damu", py: "达目" },
+            { id: 82, cat: "五、应急与状态", zh: "情况", swa: "Situation", py: "西提瑞雄" },
+            { id: 83, cat: "五、应急与状态", zh: "错误", swa: "Error", py: "艾来尔" },
+            { id: 84, cat: "五、应急与状态", zh: "偷窃", swa: "Guiba", py: "鬼吧" },
+            { id: 85, cat: "五、应急与状态", zh: "撒谎", swa: "Dewair", py: "德外耳" },
+            { id: 86, cat: "五、应急与状态", zh: "醉酒", swa: "Guliua", py: "古流啊" },
+            { id: 87, cat: "五、应急与状态", zh: "没问题/好", swa: "Sawa", py: "萨瓦" },
+            { id: 88, cat: "五、应急与状态", zh: "不行", swa: "Hapana", py: "哈巴拿" },
+            { id: 89, cat: "五、应急与状态", zh: "结束/完成", swa: "Finish", py: "费内什" },
+            { id: 90, cat: "五、应急与状态", zh: "明白吗", swa: "Elewa", py: "艾类瓦" },
+            { id: 91, cat: "六、协调与日常", zh: "现在", swa: "Sasa", py: "萨萨" },
+            { id: 92, cat: "六、协调与日常", zh: "今天", swa: "Leo", py: "勒奥" },
+            { id: 93, cat: "六、协调与日常", zh: "明天", swa: "Gexiu", py: "给休" },
+            { id: 94, cat: "六、协调与日常", zh: "昨天", swa: "Jana", py: "加纳" },
+            { id: 95, cat: "六、协调与日常", zh: "晚上", swa: "Musigu", py: "木西古" },
+            { id: 96, cat: "六、协调与日常", zh: "很多", swa: "Minge", py: "民给" },
+            { id: 97, cat: "六、协调与日常", zh: "很少", swa: "Kilogo", py: "齐洛哥" },
+            { id: 98, cat: "六、协调与日常", zh: "谢谢", swa: "Asante", py: "阿桑特" },
+            { id: 99, cat: "六、协调与日常", zh: "你好", swa: "Jambo", py: "江波" },
+            { id: 100, cat: "六、协调与日常", zh: "看看/检查", swa: "Angalia", py: "安格利亚" }
+        ];
+
+        let words = JSON.parse(localStorage.getItem('tactical_words_v3')) || defaultWords;
+        let currentCat = '全部 (100)', searchInput = '';
+        const tagStyles = { "一、指挥与身份": "bg-blue-900/30 text-blue-400 border-blue-800/60", "二、行动指令": "bg-red-900/30 text-red-400 border-red-800/60", "三、战术方位": "bg-amber-900/30 text-amber-400 border-amber-800/60", "四、装备与资源": "bg-purple-900/30 text-purple-400 border-purple-800/60", "五、应急与状态": "bg-pink-900/30 text-pink-400 border-pink-800/60", "六、协调与日常": "bg-teal-900/30 text-teal-400 border-teal-800/60" };
+
+        function renderTabs() {
+            const categories = ['全部 (100)', '一、指挥与身份', '二、行动指令', '三、战术方位', '四、装备与资源', '五、应急与状态', '六、协调与日常'];
+            document.getElementById('categoryTabs').innerHTML = categories.map(cat => `<button onclick="filterCat('${cat}')" class="px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap border border-slate-800 bg-slate-900 text-slate-400 ${currentCat === cat ? 'tab-active' : ''}">${cat}</button>`).join('');
+        }
+
+        function renderList(data = words) {
+            let filtered = currentCat === '全部 (100)' ? data : data.filter(w => w.cat === currentCat);
+            if (searchInput) filtered = filtered.filter(w => w.zh.includes(searchInput) || w.swa.toLowerCase().includes(searchInput.toLowerCase()) || w.py.includes(searchInput));
+            document.getElementById('resultCount').innerText = filtered.length;
+            document.getElementById('wordContainer').innerHTML = filtered.map(w => `
+                <div class="bg-slate-900/80 border border-slate-800/80 p-4 rounded-2xl flex items-center justify-between tactical-card">
+                    <div class="flex items-center space-x-4 min-w-0 flex-1">
+                        <span class="text-xs font-mono text-slate-600 w-6">#${w.id}</span>
+                        <div class="space-y-1">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-[9px] px-1.5 py-0.5 rounded font-bold border ${tagStyles[w.cat] || ''}">${w.cat.split('、')[1]}</span>
+                                <span class="text-sm font-bold text-slate-100 highlight-text truncate">${w.zh}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-emerald-400 font-mono font-bold text-base tracking-wide flex items-center">${w.swa}
+                                    <button onclick="event.stopPropagation(); speak('${w.swa}')" class="ml-2 text-slate-500 hover:text-emerald-400 p-1"><i class="fa-solid fa-volume-high text-xs"></i></button>
+                                </span>
+                                <span class="text-[10px] text-amber-500 font-medium">音译：${w.py}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="triggerFlashScreen('${w.zh}', '${w.swa}', '${w.py}')" class="w-10 h-10 rounded-full border border-slate-800 flex items-center justify-center text-slate-500 active:scale-95 ml-2"><i class="fa-solid fa-expand text-xs"></i></button>
+                </div>`).join('');
+        }
+
+        function filterCat(cat) { currentCat = cat; renderTabs(); renderList(); }
+        function filterWords() { searchInput = document.getElementById('searchInput').value; renderList(); }
+        function speak(text) { if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); const msg = new SpeechSynthesisUtterance(text); msg.lang = 'fr-FR'; msg.rate = 0.85; window.speechSynthesis.speak(msg); } }
+        function showAddModal() { document.getElementById('addModal').classList.remove('hidden'); }
+        function hideAddModal() { document.getElementById('addModal').classList.add('hidden'); }
+
+        function saveNewWord() {
+            const cat = document.getElementById('newCat').value, zh = document.getElementById('newZh').value, swa = document.getElementById('newSwa').value, py = document.getElementById('newPinyin').value;
+            if(!zh || !swa || !py) return showAlert("请填写所有字段");
+            words.unshift({ id: words.length + 1, cat, zh, swa, py });
+            localStorage.setItem('tactical_words_v3', JSON.stringify(words));
+            renderList(); hideAddModal(); showAlert("持久化录入成功");
+            document.getElementById('newZh').value = ''; document.getElementById('newSwa').value = ''; document.getElementById('newPinyin').value = '';
+        }
+
+        function triggerFlashScreen(zh, swa, pinyin) { document.getElementById('flashZh').innerText = zh; document.getElementById('flashSwa').innerText = swa; document.getElementById('flashPinyin').innerText = pinyin; const m = document.getElementById('flashModal'); m.classList.remove('hidden'); m.classList.add('flex'); speak(swa); }
+        function closeFlashScreen() { document.getElementById('flashModal').classList.add('hidden'); }
+        
+        let nv = false;
+        function toggleNightVision() { nv = !nv; document.body.classList.toggle('night-vision', nv); document.getElementById('headerNav').classList.toggle('night-vision', nv); showAlert(nv ? "夜视红光开启" : "夜视模式关闭"); }
+        function showAlert(msg) { const b = document.getElementById('alertBox'); document.getElementById('alertMessage').innerText = msg; b.classList.remove('opacity-0', 'pointer-events-none'); b.classList.add('opacity-100'); setTimeout(() => { b.classList.remove('opacity-100'); b.classList.add('opacity-0', 'pointer-events-none'); }, 2000); }
+
+        function exportExcel() {
+            let csv = "\uFEFF大类,序号,中文意义,外文参考,拟音\n";
+            words.forEach(w => csv += `"${w.cat}","${w.id}","${w.zh}","${w.swa}","${w.py}"\n`);
+            const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' })); link.download = `指挥100词_${new Date().getTime()}.csv`; link.click();
+        }
+
+        let qQ = [], qI = 0, qS = 0, sO = null;
+        function openQuiz() { qQ = [...words].sort(() => 0.5 - Math.random()).slice(0, 10); qI = 0; qS = 0; document.getElementById('quizModal').classList.remove('hidden'); loadQuizQuestion(); }
+        function closeQuiz() { document.getElementById('quizModal').classList.add('hidden'); }
+        function loadQuizQuestion() {
+            sO = null; const nB = document.getElementById('quizNextBtn'); nB.disabled = true; nB.className = "w-full py-3.5 rounded-xl bg-slate-850 text-slate-600 text-xs font-bold"; nB.innerText = "请选择正确答案";
+            const q = qQ[qI]; document.getElementById('quizProgress').innerText = `${qI + 1} / 10`; document.getElementById('quizScore').innerText = qS; document.getElementById('quizQuestionWord').innerText = q.swa; document.getElementById('quizQuestionPinyin').innerText = q.py;
+            let opts = [q, ...words.filter(w => w.id !== q.id).sort(() => 0.5 - Math.random()).slice(0, 3)].sort(() => 0.5 - Math.random());
+            document.getElementById('quizOptionsContainer').innerHTML = opts.map((o, i) => `<button onclick="selQuizOpt(${i}, ${o.id === q.id})" class="w-full p-4 rounded-xl bg-slate-900 border border-slate-800 text-left text-xs font-semibold quiz-opt-btn flex justify-between items-center"><span>${i + 1}. ${o.zh}</span><span class="text-[9px] text-slate-500">${o.cat.split('、')[1]}</span></button>`).join('');
+            speak(q.swa);
+        }
+        function selQuizOpt(idx, isC) {
+            if (sO !== null) return; sO = idx;
+            const btns = document.querySelectorAll('.quiz-opt-btn');
+            btns.forEach((b, i) => { if(i === idx) { if(isC) { b.className = "w-full p-4 rounded-xl bg-emerald-950/80 border-2 border-emerald-500 text-emerald-400 text-left text-xs font-bold flex justify-between items-center"; b.innerHTML += `<i class="fa-solid fa-circle-check"></i>`; qS += 10; } else { b.className = "w-full p-4 rounded-xl bg-red-950/80 border-2 border-red-500 text-red-400 text-left text-xs font-bold flex justify-between items-center"; b.innerHTML += `<i class="fa-solid fa-circle-xmark"></i>`; } } else { b.classList.add('opacity-40'); } });
+            const nB = document.getElementById('quizNextBtn'); nB.disabled = false; nB.className = "w-full py-3.5 rounded-xl bg-cyan-600 text-white text-xs font-bold shadow-lg"; nB.innerText = qI === 9 ? "完成测试" : "下一题";
+        }
+        function nextQuiz() { if (qI < 9) { qI++; loadQuizQuestion(); } else { document.getElementById('quizOptionsContainer').innerHTML = `<div class="text-center py-8 space-y-2"><div class="text-5xl font-black text-amber-400">${qS} <span class="text-xs">分</span></div><div class="text-sm font-bold">评级：<span class="text-cyan-400">${qS >= 90 ? "优秀指挥官" : qS >= 70 ? "合格指战员" : "仍需练习"}</span></div></div>`; const nB = document.getElementById('quizNextBtn'); nB.innerText = "重新测试"; nB.onclick = () => { nB.onclick = nextQuiz; openQuiz(); }; } }
+
+        window.onload = () => { renderTabs(); renderList(); if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js'); };
+    </script>
+</body>
+</html>
