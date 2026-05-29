@@ -3,82 +3,110 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>军警指挥词汇系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>军警指挥 100 词手持辅助系统</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        tactical: {
+                            gold: '#D4AF37',
+                            olive: '#556B2F',
+                            dark: '#121820',
+                            card: '#1E2631',
+                            red: '#8B0000',
+                            redlight: '#FF4D4D'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body { background-color: #0f172a; color: #f1f5f9; }
-        .card { background-color: #1e293b; border-radius: 12px; transition: transform 0.1s; }
-        .card:active { transform: scale(0.98); }
+        /* 战术红光夜视模式特定样式 */
+        .night-vision {
+            background-color: #0d0202 !important;
+            color: #ff3333 !important;
+        }
+        .night-vision .tactical-card {
+            background-color: #1a0505 !important;
+            border-color: #550000 !important;
+            color: #ff5555 !important;
+        }
+        .night-vision button {
+            color: #ff3333 !important;
+            border-color: #880000 !important;
+        }
+        .night-vision input, .night-vision select {
+            background-color: #150202 !important;
+            color: #ff3333 !important;
+            border-color: #660000 !important;
+        }
+        .night-vision .highlight-text {
+            color: #ff9999 !important;
+        }
+        /* 隐藏滚动条但保留滚动功能 */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* 针对手机端触摸反馈的优化 */
+        .active-scale:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
-<body class="p-4">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200 select-none pb-16">
 
-<div class="max-w-md mx-auto">
-    <h1 class="text-2xl font-bold mb-4 text-center text-blue-400">指挥词汇系统</h1>
-    
-    <!-- 搜索框 -->
-    <input type="text" id="search" placeholder="搜索中文、拼音或音译..." 
-           class="w-full p-3 mb-4 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-    
-    <!-- 分类筛选 -->
-    <div id="categories" class="flex gap-2 overflow-x-auto pb-4 mb-2">
-        <button onclick="filter('全部')" class="px-4 py-1 bg-blue-600 rounded-full text-sm shrink-0">全部</button>
-        <button onclick="filter('指挥')" class="px-4 py-1 bg-slate-700 rounded-full text-sm shrink-0">指挥</button>
-        <button onclick="filter('行动')" class="px-4 py-1 bg-slate-700 rounded-full text-sm shrink-0">行动</button>
-        <button onclick="filter('方位')" class="px-4 py-1 bg-slate-700 rounded-full text-sm shrink-0">方位</button>
-        <button onclick="filter('装备')" class="px-4 py-1 bg-slate-700 rounded-full text-sm shrink-0">装备</button>
-        <button onclick="filter('状态')" class="px-4 py-1 bg-slate-700 rounded-full text-sm shrink-0">状态</button>
-    </div>
-
-    <div id="list" class="space-y-3">
-        <!-- 列表由 JS 注入 -->
-    </div>
-</div>
-
-<script>
-const data = [
-    { id: 1, cat: '指挥', cn: '领导/首长', ref: 'Boss', trans: '波丝' },
-    { id: 2, cat: '指挥', cn: '警察', ref: 'Polisi', trans: '波利斯' },
-    { id: 16, cat: '行动', cn: '过来', ref: 'Guya', trans: '古雅' },
-    { id: 36, cat: '方位', cn: '前面', ref: 'Mbele', trans: '工贝里' },
-    { id: 56, cat: '装备', cn: '步枪', ref: 'Munonge', trans: '布顿给' },
-    { id: 76, cat: '状态', cn: '注意/小心', ref: 'Attention', trans: '阿当雄' },
-    // 此处仅示例部分，实际应用应填入完整100条
-    { id: 99, cat: '指挥', cn: '你好', ref: 'Jambo', trans: '江波' }
-];
-
-function render(arr) {
-    const list = document.getElementById('list');
-    list.innerHTML = arr.map(item => `
-        <div class="card p-4 border border-slate-700" onclick="speak('${item.ref}')">
-            <div class="flex justify-between items-center">
-                <span class="font-bold text-blue-300">${item.cn}</span>
-                <span class="text-xs text-slate-400">${item.ref}</span>
+    <!-- 顶部导航栏 -->
+    <header class="sticky top-0 z-50 bg-slate-950 border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-md transition-colors duration-200" id="headerNav">
+        <div class="flex items-center space-x-2">
+            <div class="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold shadow-lg shadow-emerald-900/40">
+                <i class="fa-solid fa-shield-halved"></i>
             </div>
-            <div class="text-lg mt-1 text-white">${item.trans}</div>
+            <div>
+                <h1 class="text-sm font-bold tracking-wider text-emerald-400">军警东非指挥系统</h1>
+                <p class="text-[10px] text-slate-400">斯瓦希里语/战术100词</p>
+            </div>
         </div>
-    `).join('');
-}
+        
+        <div class="flex items-center space-x-2">
+            <!-- 战术红光夜视切换 -->
+            <button onclick="toggleNightVision()" class="w-10 h-10 rounded-full border border-slate-700 bg-slate-800/80 flex items-center justify-center active-scale text-slate-300" title="夜视模式">
+                <i class="fa-solid fa-eye-low-beam text-sm text-red-500"></i>
+            </button>
+            <!-- 听写测试按钮 -->
+            <button onclick="openQuiz()" class="px-3 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-xs font-semibold flex items-center space-x-1 active-scale shadow-md shadow-emerald-950/50">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>测验</span>
+            </button>
+        </div>
+    </header>
 
-function speak(text) {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
-    window.speechSynthesis.speak(utterance);
-}
+    <!-- 主容器 -->
+    <main class="flex-1 p-3 max-w-md mx-auto w-full space-y-4" id="mainContent">
+        
+        <!-- 便捷搜索与分类过滤 -->
+        <section class="bg-slate-850 p-3 rounded-xl border border-slate-800 shadow-sm space-y-3" id="filterArea">
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                </span>
+                <input type="text" id="searchInput" oninput="handleSearch()" placeholder="搜索中文/外文/音译/拼音..." class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2 pl-9 pr-8 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-100 placeholder-slate-500">
+                <button onclick="clearSearch()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-circle-xmark text-xs"></i>
+                </button>
+            </div>
 
-document.getElementById('search').oninput = (e) => {
-    const val = e.target.value.toLowerCase();
-    render(data.filter(i => i.cn.includes(val) || i.trans.includes(val) || i.ref.toLowerCase().includes(val)));
-};
-
-function filter(cat) {
-    render(cat === '全部' ? data : data.filter(i => i.cat === cat));
-}
-
-render(data);
-</script>
-</body>
-</html>
-
-```
+            <!-- 分类滑动轴（针对手机横向滑动优化） -->
+            <div class="flex space-x-1.5 overflow-x-auto no-scrollbar py-1">
+                <button onclick="filterCategory('all')" id="cat-all" class="category-btn px-3 py-1.5 rounded-full text-[11px] font-medium bg-emerald-600 text-white whitespace-nowrap sh
