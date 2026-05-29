@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>极速战术指挥系统 v4.0</title>
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* 核心优化：全系统触控防延迟与硬件加速 */
+        * { -webkit-tap-highlight-color: transparent; outline: none; box-sizing: border-box; }
+        body { 
+            background-color: #05070A; 
+            color: #E2E8F0; 
+            font-family: system-ui, -apple-system, sans-serif;
+            text-rendering: optimizeLegibility;
+            overscroll-behavior-y: contain; /* 禁用下拉刷新，防止手势冲突 */
+        }
+
+        /* 战术卡片：强制开启显卡 GPU 渲染层 */
+        .tactical-card {
+            background: #0F172A;
+            transform: translate3d(0,0,0); /* 开启 3D 硬件加速 */
+            will-change: transform, opacity;
+            contain: layout; /* 布局隔离优化，避免全局重排 */
+            transition: transform 0.08s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .tactical-card:active { transform: scale(0.96) translate3d(0,0,0); background: #1E293B; }
+
+        /* 夜视红光滤镜极端加速 */
+        .night-vision { background-color: #0A0000 !important; }
+        .night-vision .tactical-card { background: #1A0000 !important; border: 1px solid #550000 !important; }
+        .night-vision .tactical-card:active { background: #2D0000 !important; }
+        .night-vision * { color: #FF3333 !important; border-color: #440000 !important; }
+        .night-vision .accent-text { color: #FFAAAA !important; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .tab-active { background: #0284C7; color: white; border-color: #38BDF8; }
+    </style>
+</head>
+<body class="pb-28">
+
+    <header id="headerNav" class="sticky top-0 z-50 bg-[#05070A]/90 backdrop-blur-xl border-b border-slate-800 p-4 transition-colors duration-200">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_#10B981] animate-pulse"></div>
+                <div>
+                    <h1 class="text-sm font-black tracking-tighter uppercase font-mono text-slate-100">Tactical Command Engine</h1>
+                    <p class="text-[9px] text-slate-500 tracking-widest font-mono">CORE 100 WORDS SYSTEM</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="toggleNightVision()" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-red-500 active:scale-90 transition-transform"><i class="fa-solid fa-eye-low-beam text-xs"></i></button>
+                <button onclick="openQuiz()" class="px-3 py-2 rounded-xl bg-emerald-600 text-[10px] font-black tracking-wider active:scale-95 transition-transform shadow-md shadow-emerald-950">DRLL/测验</button>
+            </div>
+        </div>
+        
+        <div class="mt-4 relative">
+            <input type="text" id="searchInput" oninput="optimizedSearch()" placeholder="输入战术意义、外文或音译快速检索..." 
+                   class="w-full bg-slate-900/60 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 text-xs"></i>
+        </div>
+
+        <div class="flex gap-1.5 overflow-x-auto no-scrollbar mt-3 pb-1" id="categoryTabs"></div>
+    </header>
+
+    <main id="wordContainer" class="p-4 space-y-2.5"></main>
+
+    <div id="flashModal" class="fixed inset-0 bg-black z-[100] hidden flex-col items-center justify-between p-8 text-center" onclick="this.classList.add('hidden')">
+        <div class="text-red-500 font-mono text-xs tracking-widest font-bold"><i class="fa-solid fa-bullhorn animate-pulse mr-1"></i> VISUAL COMMAND WEAPON</div>
+        <div class="my-auto space-y-6">
+            <div id="flashZh" class="text-6xl font-black text-amber-500 tracking-wide"></div>
+            <div id="flashSwa" class="text-5xl font-black text-white font-mono break-all px-2"></div>
+            <div id="flashPy" class="text-xl text-slate-400 font-medium"></div>
+        </div>
+        <div class="text-[10px] text-slate-600 font-mono">点击屏幕任意位置立即解除锁定</div>
+    </div>
+
+    <div id="quizModal" class="fixed inset-0 bg-[#05070A] z-50 hidden flex-col p-4">
+        <header class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <span class="text-emerald-400 font-bold text-xs"><i class="fa-solid fa-graduation-cap mr-1"></i> 指挥官口令盲听考核 (<span id="quizProgress">1/10</span>)</span>
+            <button onclick="closeQuiz()" class="text-slate-500 p-1"><i class="fa-solid fa-xmark"></i></button>
+        </header>
+        <main class="flex-1 flex flex-col justify-between py-4">
+            <div class="space-y-3">
+                <div class="text-right text-xs text-slate-400 font-mono">CURRENT SCORE: <strong class="text-emerald-400 text-sm font-bold" id="quizScore">0</strong></div>
+                <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 text-center">
+                    <div class="text-3xl font-black text-white tracking-wide font-mono" id="quizQuestionWord">---</div>
+                    <div class="text-xs text-slate-500 mt-2">推荐拟音：<span class="text-emerald-500 font-bold" id="quizQuestionPinyin">---</span></div>
+                </div>
+            </div>
+            <div class="space-y-2" id="quizOptionsContainer"></div>
+            <button id="quizNextBtn" disabled onclick="nextQuiz()" class="w-full py-3.5 rounded-xl bg-slate-800 text-slate-500 text-xs font-bold transition-all">请选择正确战术含义</button>
+        </main>
+    </div>
+
+    <footer class="fixed bottom-0 left-0 right-0 bg-slate-950/90 backdrop-blur-md border-t border-slate-900 px-4 py-3 z-40 flex items-center justify-between text-[10px] text-slate-500 font-mono">
+        <div>CORE MODULE LOCKED // LOCAL STORAGE ACTIVE</div>
+        <div>MATCHED: <span id="resultCount" class="text-sky-400 font-bold">100</span> / 100</div>
+    </footer>
+
+    <script>
+        // 100个完整战术指令数据包（解耦嵌入，秒级加载）
+        const rawData = [
+            {id:1, cat:"一、指挥与身份", zh:"领导/首长", swa:"Boss", py:"波丝"},
+            {id:2, cat:"一、指挥与身份", zh:"警察", swa:"Polisi", py:"波利斯"},
+            {id:3, cat:"一、指挥与身份", zh:"军人", swa:"Soldat", py:"索哒"},
+            {id:4, cat:"一、指挥与身份", zh:"保安", swa:"Shei", py:"谢义"},
+            {id:5, cat:"一、指挥与身份", zh:"我", swa:"Miye", py:"米也"},
+            {id:6, cat:"一、指挥与身份", zh:"你", swa:"Wei", py:"微"},
+            {id:7, cat:"一、指挥与身份", zh:"他", swa:"Wuyou", py:"无有"},
+            {id:8, cat:"一、指挥与身份", zh:"刚果人", swa:"Congoli", py:"刚果里"},
+            {id:9, cat:"一、指挥与身份", zh:"外国人", swa:"Bazungu", py:"巴容古"},
+            {id:10, cat:"一、指挥与身份", zh:"姓名", swa:"Nom", py:"农"},
+            {id:11, cat:"一、指挥与身份", zh:"身份证", swa:"ID", py:"埃迪"},
+            {id:12, cat:"一、指挥与身份", zh:"护照", swa:"Passeport", py:"帕斯报特"},
+            {id:13, cat:"一、指挥与身份", zh:"签字", swa:"Signer", py:"新艳"},
+            {id:14, cat:"一、指挥与身份", zh:"盖章", swa:"Cachet", py:"嘎谢"},
+            {id:15, cat:"一、指挥与身份", zh:"组织/团伙", swa:"Group", py:"古鲁普"},
+            {id:16, cat:"二、行动指令", zh:"过来", swa:"Guya", py:"古雅"},
+            {id:17, cat:"二、行动指令", zh:"走/离开", swa:"Dembia", py:"点必亚"},
+            {id:18, cat:"二、行动指令", zh:"停止/站住", swa:"Simama", py:"西马马"},
+            {id:19, cat:"二、行动指令", zh:"别动", swa:"Guigala", py:"规嘎拉"},
+            {id:20, cat:"二、行动指令", zh:"坐下", swa:"Igara", py:"以嘎拉"},
+            {id:21, cat:"二、行动指令", zh:"起来", swa:"Selewei", py:"塞来为"},
+            {id:22, cat:"二、行动指令", zh:"进去", swa:"Gunjia", py:"滚几亚"},
+            {id:23, cat:"二、行动指令", zh:"出来", swa:"Toka", py:"到嘎"},
+            {id:24, cat:"二、行动指令", zh:"放下", swa:"Lebo/Wega", py:"来博"},
+            {id:25, cat:"二、行动指令", zh:"拿起/提着", swa:"Beba", py:"贝巴"},
+            {id:26, cat:"二、行动指令", zh:"快点", swa:"Fast", py:"法斯特"},
+            {id:27, cat:"二、行动指令", zh:"慢点", swa:"Bolebole", py: "波累波累"},
+            {id:28, cat:"二、行动指令", zh:"等一下", swa:"Adang", py:"阿当"},
+            {id:29, cat:"二、行动指令", zh:"集合", swa:"Pode", py:"抱得"},
+            {id:30, cat:"二、行动指令", zh:"跟着", swa:"Gogoda", py:"过过大"},
+            {id:31, cat:"二、行动指令", zh:"返回", swa:"Revenir", py:"雷维尼尔"},
+            {id:32, cat:"二、行动指令", zh:"回去", swa:"Retourner", py:"雷度尔内"},
+            {id:33, cat:"二、行动指令", zh:"寻找/搜查", swa:"Dafuta", py:"达扶答"},
+            {id:34, cat:"二、行动指令", zh:"抓捕", swa:"Gubamba", py:"古邦巴"},
+            {id:35, cat:"二、行动指令", zh:"蹲下", swa:"Shusa", py:"羞莎"},
+            {id:36, cat:"三、战术方位", zh:"前面", swa:"Mbele", py:"工贝里"},
+            {id:37, cat:"三、战术方位", zh:"后面", swa:"Mugongo", py:"莫刚哥"},
+            {id:38, cat:"三、战术方位", zh:"左边", swa:"Goshi", py:"果西"},
+            {id:39, cat:"三、战术方位", zh:"右边", swa:"Tolashi", py:"托拉西"},
+            {id:40, cat:"三、战术方位", zh:"上面", swa:"Yulu", py:"尤路"},
+            {id:41, cat:"三、战术方位", zh:"下面", swa:"Jini", py:"基尼"},
+            {id:42, cat:"三、战术方位", zh:"这里", swa:"Aba", py:"阿巴"},
+            {id:43, cat:"三、战术方位", zh:"那里", swa:"Pale", py:"巴雷"},
+            {id:44, cat:"三、战术方位", zh:"里面", swa:"Mangara", py:"忙嘎拉"},
+            {id:45, cat:"三、战术方位", zh:"外面", swa:"Gera", py:"给拉"},
+            {id:46, cat:"三、战术方位", zh:"中间", swa:"Gajigaji", py:"嘎几嘎急"},
+            {id:47, cat:"三、战术方位", zh:"旁边", swa:"Gombe", py:"工贝"},
+            {id:48, cat:"三、战术方位", zh:"北", swa:"North", py:"诺斯"},
+            {id:49, cat:"三、战术方位", zh:"南", swa:"South", py:"色德"},
+            {id:50, cat:"三、战术方位", zh:"东", swa:"East", py:"爱斯特"},
+            {id:51, cat:"三、战术方位", zh:"西", swa:"West", py:"威斯特"},
+            {id:52, cat:"三、战术方位", zh:"城市", swa:"Ville", py:"维勒"},
+            {id:53, cat:"三、战术方位", zh:"马路", swa:"Balabala", py:"巴拉巴拉"},
+            {id:54, cat:"三、战术方位", zh:"桥", swa:"Jilalou", py:"几拉漏"},
+            {id:55, cat:"三、战术方位", zh:"围墙", swa:"Bida", py:"比达"},
+            {id:56, cat:"四、装备与资源", zh:"步枪", swa:"Munonge", py:"布顿给"},
+            {id:57, cat:"四、装备与资源", zh:"手枪/枪", swa:"Munduge", py:"木冬给"},
+            {id:58, cat:"四、装备与资源", zh:"坦克", swa:"Shaletegomba", py:"夏雷得供巴"},
+            {id:59, cat:"四、装备与资源", zh:"大炮", swa:"Bangmu", py:"帮木"},
+            {id:60, cat:"四、装备与资源", zh:"汽车", swa:"Motoga", py:"莫道嘎"},
+            {id:61, cat:"四、装备与资源", zh:"大卡车", swa:"Truck", py:"德拉克"},
+            {id:62, cat:"四、装备与资源", zh:"摩托车", swa:"Dugudugu", py:"杜古杜古"},
+            {id:63, cat:"四、装备与资源", zh:"对讲机", swa:"Bik", py:"比克"},
+            {id:64, cat:"四、装备与资源", zh:"手机", swa:"Simu", py:"西姆"},
+            {id:65, cat:"四、装备与资源", zh:"手电筒", swa:"Torch", py:"托奇"},
+            {id:66, cat:"四、装备与资源", zh:"钥匙", swa:"Fungulu", py:"风古路"},
+            {id:67, cat:"四、装备与资源", zh:"汽油", swa:"Essence", py:"艾桑斯"},
+            {id:68, cat:"四、装备与资源", zh:"柴油", swa:"Mazout", py:"马如特"},
+            {id:69, cat:"四、装备与资源", zh:"绳子", swa:"Gamba", py:"干巴"},
+            {id:70, cat:"四、装备与资源", zh:"手铐", swa:"Geragang", py:"哥拉岗"},
+            {id:71, cat:"四、装备与资源", zh:"灭火器", swa:"Extincteur", py:"艾斯丁特而"},
+            {id:72, cat:"四、装备与资源", zh:"地图/计划", swa:"Plan", py:"普朗"},
+            {id:73, cat:"四、装备与资源", zh:"哨子", swa:"Flimbi", py:"夫林比"},
+            {id:74, cat:"四、装备与资源", zh:"信号", swa:"Lero", py:"雷若"},
+            {id:75, cat:"四、装备与资源", zh:"电池", swa:"Batterie", py:"巴得里"},
+            {id:76, cat:"五、应急与状态", zh:"注意/小心", swa:"Attention", py:"阿当雄"},
+            {id:77, cat:"五、应急与状态", zh:"危险", swa:"Danger", py:"单杰"},
+            {id:78, cat:"五、应急与状态", zh:"爆炸", swa:"Pasuga", py:"巴苏嘎"},
+            {id:79, cat:"五、应急与状态", zh:"死亡", swa:"Gufa", py:"古发"},
+            {id:80, cat:"五、应急与状态", zh:"受伤", swa:"Gilonda", py:"几龙答"},
+            {id:81, cat:"五、应急与状态", zh:"流血", swa:"Damu", py:"达目"},
+            {id:82, cat:"五、应急与状态", zh:"情况", swa:"Situation", py:"西提瑞雄"},
+            {id:83, cat:"五、应急与状态", zh:"错误", swa:"Error", py:"艾来尔"},
+            {id:84, cat:"五、应急与状态", zh:"偷窃", swa:"Guiba", py:"鬼吧"},
+            {id:85, cat:"五、应急与状态", zh:"撒谎", swa:"Dewair", py:"德外耳"},
+            {id:86, cat:"五、应急与状态", zh:"醉酒", swa:"Guliua", py:"古流啊"},
+            {id:87, cat:"五、应急与状态", zh:"没问题/好", swa:"Sawa", py:"萨瓦"},
+            {id:88, cat:"五、应急与状态", zh:"不行", swa:"Hapana", py:"哈巴拿"},
+            {id:89, cat:"五、应急与状态", zh:"结束/完成", swa:"Finish", py:"费内什"},
+            {id:90, cat:"五、应急与状态", zh:"明白吗", swa:"Elewa", py:"艾类瓦"},
+            {id:91, cat:"六、协调与日常", zh:"现在", swa:"Sasa", py:"萨萨"},
+            {id:92, cat:"六、协调与日常", zh:"今天", swa:"Leo", py:"勒奥"},
+            {id:93, cat:"六、协调与日常", zh:"明天", swa:"Gexiu", py:"给休"},
+            {id:94, cat:"六、协调与日常", zh:"昨天", swa:"Jana", py:"加纳"},
+            {id:95, cat:"六、协调与日常", zh:"晚上", swa:"Musigu", py:"木西古"},
+            {id:96, cat:"六、协调与日常", zh:"很多", swa:"Minge", py:"民给"},
+            {id:97, cat:"六、协调与日常", zh:"很少", swa:"Kilogo", py:"齐洛哥"},
+            {id:98, cat:"六、协调与日常", zh:"谢谢", swa:"Asante", py:"阿桑特"},
+            {id:99, cat:"六、协调与日常", zh:"你好", swa:"Jambo", py:"江波"},
+            {id:100, cat:"六、协调与日常", zh:"看看/检查", swa:"Angalia", py:"安格利亚"}
+        ];
+
+        let currentCat = "全部";
+        let searchTimer = null;
+
+        // 核心优化引擎组件
+        const Engine = {
+            // 使用 DocumentFragment + requestAnimationFrame 达成极致的 DOM 渲染
+            render(data) {
+                const container = document.getElementById('wordContainer');
+                container.innerHTML = ''; 
+                
+                const fragment = document.createDocumentFragment();
+                const isAll = currentCat === "全部";
+                
+                // 单次 $O(n)$ 线性过滤
+                const filtered = data.filter(item => {
+                    if (!isAll && item.cat !== currentCat) return false;
+                    const kw = document.getElementById('searchInput').value.trim().toLowerCase();
+                    if (!kw) return true;
+                    return item.zh.includes(kw) || item.swa.toLowerCase().includes(kw) || item.py.includes(kw);
+                });
+
+                document.getElementById('resultCount').innerText = filtered.length;
+
+                filtered.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'tactical-card p-4 rounded-xl border border-slate-800/80 flex items-center justify-between';
+                    card.onclick = () => Engine.triggerFlash(item);
+                    card.innerHTML = `
+                        <div class="min-w-0 flex-1 pr-2">
+                            <div class="flex items-center gap-2 mb-0.5">
+                                <span class="text-[9px] text-slate-600 font-mono font-bold">#${String(item.id).padStart(3,'0')}</span>
+                                <span class="text-xs font-bold text-slate-300 accent-text">${item.zh}</span>
+                            </div>
+                            <div class="text-base font-black text-sky-400 font-mono tracking-wide">${item.swa}</div>
+                            <div class="text-[10px] text-slate-500 font-medium">拟音：${item.py}</div>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center border border-slate-800 text-slate-500"><i class="fa-solid fa-volume-high text-[10px]"></i></div>
+                    `;
+                    fragment.appendChild(card);
+                });
+
+                // 配合系统同步帧率刷新画面
+                requestAnimationFrame(() => {
+                    container.appendChild(fragment);
+                });
+            },
+
+            triggerFlash(item) {
+                document.getElementById('flashZh').innerText = item.zh;
+                document.getElementById('flashSwa').innerText = item.swa;
+                document.getElementById('flashPy').innerText = `拟音：${item.py}`;
+                document.getElementById('flashModal').classList.remove('hidden');
+                this.speak(item.swa);
+            },
+
+            speak(text) {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel(); // 强行斩断上一次发音队列，防内存堆积
+                    const msg = new SpeechSynthesisUtterance(text);
+                    msg.lang = 'fr-FR'; // 法语声道最贴近东非当地斯瓦希里语口音语调
+                    msg.rate = 0.88; // 略微调慢语速确保听得清
+                    window.speechSynthesis.speak(msg);
+                }
+            }
+        };
+
+        // 100ms 智能防抖过滤，极大缓解高速输入时的设备 CPU 响应负荷
+        function optimizedSearch() {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => Engine.render(rawData), 100);
+        }
+
+        function renderTabs() {
+            const tabs = ["全部", "一、指挥与身份", "二、行动指令", "三、战术方位", "四、装备与资源", "五、应急与状态", "六、协调与日常"];
+            document.getElementById('categoryTabs').innerHTML = tabs.map(t => `
+                <button onclick="switchCat('${t}')" class="px-3 py-1.5 rounded-xl text-[11px] font-bold whitespace-nowrap border border-slate-800 bg-slate-900/60 text-slate-400 transition-colors ${currentCat === t ? 'tab-active' : ''}">
+                    ${t.includes('、') ? t.split('、')[1] : t}
+                </button>
+            `).join('');
+        }
+
+        function switchCat(cat) {
+            currentCat = cat;
+            renderTabs();
+            Engine.render(rawData);
+        }
+
+        function toggleNightVision() {
+            document.body.classList.toggle('night-vision');
+            document.getElementById('headerNav').classList.toggle('night-vision');
+            document.getElementById('quizModal').classList.toggle('night-vision');
+        }
+
+        // --- 测验控制系统组件 ---
+        let qQueue = [], qIdx = 0, qScore = 0, qSelected = false;
+        function openQuiz() {
+            qQueue = [...rawData].sort(() => 0.5 - Math.random()).slice(0, 10);
+            qIdx = 0; qScore = 0;
+            document.getElementById('quizModal').classList.remove('hidden');
+            loadQuiz();
+        }
+        function closeQuiz() { document.getElementById('quizModal').classList.add('hidden'); }
+        function loadQuiz() {
+            qSelected = false;
+            const nextBtn = document.getElementById('quizNextBtn');
+            nextBtn.disabled = true;
+            nextBtn.className = "w-full py-3.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-600 text-xs font-bold";
+            nextBtn.innerText = "请选择正确战术含义";
+            
+            const cur = qQueue[qIdx];
+            document.getElementById('quizProgress').innerText = `${qIdx + 1} / 10`;
+            document.getElementById('quizScore').innerText = qScore;
+            document.getElementById('quizQuestionWord').innerText = cur.swa;
+            document.getElementById('quizQuestionPinyin').innerText = cur.py;
+
+            let options = [cur, ...rawData.filter(w => w.id !== cur.id).sort(() => 0.5 - Math.random()).slice(0, 3)].sort(() => 0.5 - Math.random());
+            document.getElementById('quizOptionsContainer').innerHTML = options.map((opt, i) => `
+                <button onclick="verifyQuiz(${opt.id === cur.id}, this)" class="quiz-opt w-full p-3.5 rounded-xl bg-slate-900 border border-slate-800/80 text-left text-xs font-bold flex justify-between items-center active:scale-[0.99]">
+                    <span>${i + 1}. ${opt.zh}</span>
+                    <span class="text-[9px] text-slate-600 font-mono">${opt.cat.substring(2)}</span>
+                </button>
+            `).join('');
+            Engine.speak(cur.swa);
+        }
+        function verifyQuiz(isCorrect, element) {
+            if (qSelected) return;
+            qSelected = true;
+            const opts = document.querySelectorAll('.quiz-opt');
+            opts.forEach(btn => btn.style.opacity = "0.3");
+            element.style.opacity = "1";
+            
+            if (isCorrect) {
+                element.className = "quiz-opt w-full p-3.5 rounded-xl bg-emerald-950/70 border-2 border-emerald-500 text-emerald-400 text-left text-xs font-black flex justify-between items-center";
+                qScore += 10;
+                document.getElementById('quizScore').innerText = qScore;
+            } else {
+                element.className = "quiz-opt w-full p-3.5 rounded-xl bg-red-950/70 border-2 border-red-500 text-red-400 text-left text-xs font-black flex justify-between items-center";
+            }
+            
+            const nextBtn = document.getElementById('quizNextBtn');
+            nextBtn.disabled = false;
+            nextBtn.className = "w-full py-3.5 rounded-xl bg-sky-600 text-white text-xs font-bold shadow-lg shadow-sky-950";
+            nextBtn.innerText = qIdx === 9 ? "查看考核报告" : "进入下一题";
+        }
+        function nextQuiz() {
+            if (qIdx < 9) { qIdx++; loadQuiz(); } 
+            else {
+                let rank = qScore >= 90 ? "优秀指挥官" : qScore >= 70 ? "合格指战员" : "需加强训练";
+                document.getElementById('quizOptionsContainer').innerHTML = `
+                    <div class="text-center py-6 space-y-2">
+                        <div class="text-5xl font-black text-amber-500 font-mono">${qScore} <span class="text-xs text-slate-500">得分</span></div>
+                        <div class="text-xs font-bold text-slate-300">战术判定：<span class="text-emerald-400">${rank}</span></div>
+                    </div>`;
+                const nextBtn = document.getElementById('quizNextBtn');
+                nextBtn.innerText = "重新考核";
+                nextBtn.onclick = () => { nextBtn.onclick = nextQuiz; openQuiz(); };
+            }
+        }
+
+        // 初始化
+        window.onload = () => {
+            renderTabs();
+            Engine.render(rawData);
+        };
+    </script>
+</body>
+</html>
