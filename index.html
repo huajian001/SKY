@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>海外安全官指挥术语库</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+        body { font-family: 'Noto Sans SC', system-ui, sans-serif; }
+        .term-card:hover { transform: translateY(-6px); }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+    <div class="flex h-screen overflow-hidden">
+        <!-- 侧边栏（同之前） -->
+        <div class="w-72 bg-white dark:bg-gray-800 border-r flex flex-col">
+            <div class="p-6 border-b">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl">安</div>
+                    <div>
+                        <h1 class="text-2xl font-bold">安全指挥术语</h1>
+                        <p class="text-sm text-gray-500">海外行动 100 词</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4">
+                <input id="searchInput" type="text" placeholder="搜索中文 / 音译 / 英文..." 
+                       class="w-full bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-2xl py-4 px-5 pl-12 focus:outline-none">
+            </div>
+
+            <div class="flex-1 overflow-y-auto px-3" id="categoryNav"></div>
+
+            <div class="p-4 border-t">
+                <button onclick="exportToExcel()" 
+                        class="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-2xl font-medium flex items-center justify-center gap-2">
+                    <i class="fas fa-file-excel"></i>
+                    一键导出 Excel
+                </button>
+            </div>
+        </div>
+
+        <!-- 主内容 -->
+        <div class="flex-1 flex flex-col">
+            <div class="h-16 border-b bg-white dark:bg-gray-800 px-8 flex items-center justify-between">
+                <button onclick="showAll()" class="flex items-center gap-2 px-5 py-2 rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fas fa-list"></i> 全部术语
+                </button>
+                <div class="text-sm font-medium" id="currentCategory">全部 (100)</div>
+            </div>
+
+            <div class="flex-1 overflow-auto p-6" id="mainContent">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="termsGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 详情弹窗 -->
+    <div id="detailModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-3xl max-w-lg w-full mx-4">
+            <div class="p-8" id="modalContent"></div>
+            <div class="border-t p-4 flex gap-3">
+                <button onclick="speakCurrent()" class="flex-1 py-3 border rounded-2xl hover:bg-gray-100">🔊 朗读音译</button>
+                <button onclick="closeModal()" class="flex-1 py-3 bg-blue-600 text-white rounded-2xl">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const terms = [ /* 你的100条数据，保持不变 */ 
+            // ...（此处粘贴之前代码中的 terms 数组，内容相同）
+            { id: 1, category: "指挥与身份", num: 1, zh: "领导/首长", ref: "Boss", trans: "波丝" },
+            // ... 省略其余98条，请把之前版本的 terms 完整复制进来 ...
+        ];
+
+        // 渲染函数（省略，与之前版本一致）
+        function renderCategories() { /* 同之前 */ }
+        function renderTerms(filtered) { /* 同之前 */ }
+        function showDetail(id) { /* 同之前 */ }
+        function closeModal() { /* 同之前 */ }
+        function filterByCategory(cat) { /* 同之前 */ }
+        function showAll() { filterByCategory('all'); }
+
+        // === 新增：一键导出专业 Excel ===
+        function exportToExcel() {
+            const data = terms.map(t => ({
+                "序号": t.num,
+                "类别": t.category,
+                "中文意义": t.zh,
+                "参考词": t.ref,
+                "推荐音译": t.trans
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(data);
+            
+            // 添加样式
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "安全指挥术语");
+
+            // 自动调整列宽
+            ws['!cols'] = [
+                {wch: 8}, {wch: 18}, {wch: 25}, {wch: 18}, {wch: 20}
+            ];
+
+            XLSX.writeFile(wb, `海外安全官指挥术语_100词_${new Date().toISOString().slice(0,10)}.xlsx`);
+            
+            alert("✅ Excel 文件已下载！\n\n可直接用 Excel / WPS 打开并导入使用。");
+        }
+
+        // 语音朗读
+        let currentTerm = null;
+        function showDetail(id) {
+            currentTerm = terms.find(t => t.id === id);
+   
