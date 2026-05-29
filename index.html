@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>海外安全官指挥术语系统</title>
+  <title>海外安全官指挥术语系统 v1.0</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
@@ -12,12 +12,8 @@
       background-color: #001a00 !important;
       color: #00ff41 !important;
     }
-    .night-vision table {
-      background-color: #001a00;
-    }
-    .night-vision th, .night-vision td {
+    .night-vision table, .night-vision th, .night-vision td {
       border-color: #00ff41 !important;
-      color: #00ff41;
     }
     .night-vision input, .night-vision select, .night-vision button {
       background-color: #002200;
@@ -26,13 +22,14 @@
     }
     .matrix-bg {
       background-image: 
-        linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
-      background-size: 20px 20px;
+        linear-gradient(rgba(0, 255, 65, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 65, 0.04) 1px, transparent 1px);
+      background-size: 25px 25px;
     }
+    th { position: sticky; top: 0; z-index: 10; }
   </style>
 </head>
-<body class="bg-gray-100 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-screen">
+<body class="bg-zinc-100 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-screen">
 
 <div class="max-w-7xl mx-auto p-4">
   <div class="flex justify-between items-center mb-6">
@@ -40,20 +37,20 @@
       <i class="fas fa-shield-alt"></i> 海外安全官指挥术语系统
     </h1>
     <button onclick="toggleNightVision()" 
-            class="px-5 py-2 bg-green-700 hover:bg-green-600 text-white rounded-lg flex items-center gap-2 transition-all">
-      <i class="fas fa-eye"></i> <span id="nightBtn">夜视模式</span>
+            class="px-6 py-3 bg-green-700 hover:bg-green-600 text-white rounded-xl flex items-center gap-2 font-medium">
+      <i class="fas fa-eye"></i> <span id="nightBtn">夜视模式 ON</span>
     </button>
   </div>
 
   <!-- 工具栏 -->
-  <div class="bg-white dark:bg-zinc-900 p-4 rounded-xl shadow mb-6 flex flex-wrap gap-4 items-center">
+  <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl shadow mb-6 flex flex-wrap gap-4 items-center">
     <input type="text" id="searchInput" 
-           placeholder="搜索 中文 / 音译 / 斯瓦希里语..." 
+           placeholder="🔍 搜索 中文 / 音译 / 斯瓦希里语..." 
            onkeyup="filterTable()"
-           class="flex-1 min-w-[280px] px-4 py-3 border border-gray-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:border-green-500">
+           class="flex-1 min-w-[300px] px-5 py-4 border border-gray-300 dark:border-zinc-700 rounded-xl focus:outline-none focus:border-green-500 text-base">
 
     <select id="categoryFilter" onchange="filterTable()" 
-            class="px-4 py-3 border border-gray-300 dark:border-zinc-700 rounded-lg">
+            class="px-5 py-4 border border-gray-300 dark:border-zinc-700 rounded-xl">
       <option value="">全部分类</option>
       <option value="一、指挥与身份">一、指挥与身份</option>
       <option value="二、行动指令">二、行动指令</option>
@@ -64,17 +61,14 @@
     </select>
 
     <div class="flex gap-3">
-      <button onclick="showAddModal()" 
-              class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center gap-2">
+      <button onclick="showAddModal()" class="px-6 py-4 bg-green-600 hover:bg-green-700 text-white rounded-xl flex items-center gap-2">
         <i class="fas fa-plus"></i> 新增
       </button>
-      <button onclick="exportCSV()" 
-              class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2">
-        <i class="fas fa-download"></i> 导出
+      <button onclick="exportCSV()" class="px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl flex items-center gap-2">
+        <i class="fas fa-download"></i> 导出CSV
       </button>
-      <button onclick="document.getElementById('importFile').click()" 
-              class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg flex items-center gap-2">
-        <i class="fas fa-upload"></i> 导入
+      <button onclick="document.getElementById('importFile').click()" class="px-6 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl flex items-center gap-2">
+        <i class="fas fa-upload"></i> 导入CSV
       </button>
       <input type="file" id="importFile" accept=".csv" class="hidden" onchange="importCSV(event)">
     </div>
@@ -83,14 +77,14 @@
   <!-- 表格 -->
   <div class="overflow-x-auto bg-white dark:bg-zinc-900 rounded-2xl shadow">
     <table class="w-full text-sm" id="dataTable">
-      <thead class="bg-gray-200 dark:bg-zinc-800">
+      <thead class="bg-zinc-200 dark:bg-zinc-800 sticky top-0">
         <tr>
-          <th class="px-4 py-4 text-left">类别</th>
-          <th class="px-4 py-4 text-left">序号</th>
-          <th class="px-4 py-4 text-left">中文意义</th>
-          <th class="px-4 py-4 text-left">斯瓦希里语/参考</th>
-          <th class="px-4 py-4 text-left">推荐音译</th>
-          <th class="px-4 py-4 w-24 text-center">操作</th>
+          <th class="px-6 py-5 text-left">类别</th>
+          <th class="px-6 py-5 text-left">序号</th>
+          <th class="px-6 py-5 text-left">中文意义</th>
+          <th class="px-6 py-5 text-left">斯瓦希里语/参考</th>
+          <th class="px-6 py-5 text-left">推荐音译</th>
+          <th class="px-6 py-5 w-28 text-center">操作</th>
         </tr>
       </thead>
       <tbody id="tableBody" class="divide-y divide-gray-200 dark:divide-zinc-700"></tbody>
@@ -100,47 +94,44 @@
 
 <!-- 新增/编辑弹窗 -->
 <div id="modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-  <div class="bg-white dark:bg-zinc-900 rounded-2xl p-8 w-full max-w-lg">
+  <div class="bg-white dark:bg-zinc-900 rounded-3xl p-8 w-full max-w-lg mx-4">
     <h2 id="modalTitle" class="text-2xl font-bold mb-6">新增术语</h2>
-    
     <input type="hidden" id="editId">
-    
-    <div class="space-y-4">
+
+    <div class="space-y-5">
       <div>
-        <label class="block text-sm mb-1">类别</label>
-        <input type="text" id="catInput" class="w-full px-4 py-3 border rounded-lg">
+        <label class="block text-sm mb-1 font-medium">类别</label>
+        <input type="text" id="catInput" class="w-full px-5 py-4 border rounded-2xl">
       </div>
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-2 gap-5">
         <div>
-          <label class="block text-sm mb-1">序号</label>
-          <input type="number" id="numInput" class="w-full px-4 py-3 border rounded-lg">
+          <label class="block text-sm mb-1 font-medium">序号</label>
+          <input type="number" id="numInput" class="w-full px-5 py-4 border rounded-2xl">
         </div>
         <div>
-          <label class="block text-sm mb-1">中文意义</label>
-          <input type="text" id="cnInput" class="w-full px-4 py-3 border rounded-lg">
+          <label class="block text-sm mb-1 font-medium">中文意义</label>
+          <input type="text" id="cnInput" class="w-full px-5 py-4 border rounded-2xl">
         </div>
       </div>
       <div>
-        <label class="block text-sm mb-1">斯瓦希里语/参考词</label>
-        <input type="text" id="swInput" class="w-full px-4 py-3 border rounded-lg">
+        <label class="block text-sm mb-1 font-medium">斯瓦希里语/参考词</label>
+        <input type="text" id="swInput" class="w-full px-5 py-4 border rounded-2xl">
       </div>
       <div>
-        <label class="block text-sm mb-1">推荐音译</label>
-        <input type="text" id="pyInput" class="w-full px-4 py-3 border rounded-lg">
+        <label class="block text-sm mb-1 font-medium">推荐音译</label>
+        <input type="text" id="pyInput" class="w-full px-5 py-4 border rounded-2xl">
       </div>
     </div>
 
     <div class="flex gap-4 mt-8">
-      <button onclick="saveTerm()" 
-              class="flex-1 py-4 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium">保存</button>
-      <button onclick="closeModal()" 
-              class="flex-1 py-4 bg-gray-300 hover:bg-gray-400 dark:bg-zinc-700 text-black dark:text-white rounded-xl">取消</button>
+      <button onclick="saveTerm()" class="flex-1 py-5 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-medium">保存</button>
+      <button onclick="closeModal()" class="flex-1 py-5 bg-gray-300 hover:bg-gray-400 dark:bg-zinc-700 rounded-2xl">取消</button>
     </div>
   </div>
 </div>
 
 <script>
-// ==================== 数据 ====================
+// ==================== 完整 100 条数据 ====================
 let terms = [
   {id:1, cat:"一、指挥与身份", num:1, cn:"领导/首长", sw:"Boss", py:"波丝"},
   {id:2, cat:"一、指挥与身份", num:2, cn:"警察", sw:"Polisi", py:"波利斯"},
@@ -157,7 +148,6 @@ let terms = [
   {id:13, cat:"一、指挥与身份", num:13, cn:"签字", sw:"Signer", py:"新艳"},
   {id:14, cat:"一、指挥与身份", num:14, cn:"盖章", sw:"Cachet", py:"嘎谢"},
   {id:15, cat:"一、指挥与身份", num:15, cn:"组织/团伙", sw:"Group", py:"古鲁普"},
-  
   {id:16, cat:"二、行动指令", num:16, cn:"过来", sw:"Guya", py:"古雅"},
   {id:17, cat:"二、行动指令", num:17, cn:"走/离开", sw:"Dembia", py:"点必亚"},
   {id:18, cat:"二、行动指令", num:18, cn:"停止/站住", sw:"Simama", py:"西马马"},
@@ -178,15 +168,74 @@ let terms = [
   {id:33, cat:"二、行动指令", num:33, cn:"寻找/搜查", sw:"Dafuta", py:"达扶答"},
   {id:34, cat:"二、行动指令", num:34, cn:"抓捕", sw:"Gubamba", py:"古邦巴"},
   {id:35, cat:"二、行动指令", num:35, cn:"蹲下", sw:"Shusa", py:"羞莎"},
-  
-  // 后续数据可继续补充（此处省略部分，实际已包含全部100条）
-  // 为节省篇幅，我只展示了部分，实际代码中我已全部加入
+  {id:36, cat:"三、战术方位", num:36, cn:"前面", sw:"Mbele", py:"工贝里"},
+  {id:37, cat:"三、战术方位", num:37, cn:"后面", sw:"Mugongo", py:"莫刚哥"},
+  {id:38, cat:"三、战术方位", num:38, cn:"左边", sw:"Goshi", py:"果西"},
+  {id:39, cat:"三、战术方位", num:39, cn:"右边", sw:"Tolashi", py:"托拉西"},
+  {id:40, cat:"三、战术方位", num:40, cn:"上面", sw:"Yulu", py:"尤路"},
+  {id:41, cat:"三、战术方位", num:41, cn:"下面", sw:"Jini", py:"基尼"},
+  {id:42, cat:"三、战术方位", num:42, cn:"这里", sw:"Aba", py:"阿巴"},
+  {id:43, cat:"三、战术方位", num:43, cn:"那里", sw:"Pale", py:"巴雷"},
+  {id:44, cat:"三、战术方位", num:44, cn:"里面", sw:"Mangara", py:"忙嘎拉"},
+  {id:45, cat:"三、战术方位", num:45, cn:"外面", sw:"Gera", py:"给拉"},
+  {id:46, cat:"三、战术方位", num:46, cn:"中间", sw:"Gajigaji", py:"嘎几嘎急"},
+  {id:47, cat:"三、战术方位", num:47, cn:"旁边", sw:"Gombe", py:"工贝"},
+  {id:48, cat:"三、战术方位", num:48, cn:"北", sw:"North", py:"诺斯"},
+  {id:49, cat:"三、战术方位", num:49, cn:"南", sw:"South", py:"色德"},
+  {id:50, cat:"三、战术方位", num:50, cn:"东", sw:"East", py:"爱斯特"},
+  {id:51, cat:"三、战术方位", num:51, cn:"西", sw:"West", py:"威斯特"},
+  {id:52, cat:"三、战术方位", num:52, cn:"城市", sw:"Ville", py:"维勒"},
+  {id:53, cat:"三、战术方位", num:53, cn:"马路", sw:"Balabala", py:"巴拉巴拉"},
+  {id:54, cat:"三、战术方位", num:54, cn:"桥", sw:"Jilalou", py:"几拉漏"},
+  {id:55, cat:"三、战术方位", num:55, cn:"围墙", sw:"Bida", py:"比达"},
+  {id:56, cat:"四、装备与资源", num:56, cn:"步枪", sw:"Munonge", py:"布顿给"},
+  {id:57, cat:"四、装备与资源", num:57, cn:"手枪/枪", sw:"Munduge", py:"木冬给"},
+  {id:58, cat:"四、装备与资源", num:58, cn:"坦克", sw:"Shaletegomba", py:"夏雷得供巴"},
+  {id:59, cat:"四、装备与资源", num:59, cn:"大炮", sw:"Bangmu", py:"帮木"},
+  {id:60, cat:"四、装备与资源", num:60, cn:"汽车", sw:"Motoga", py:"莫道嘎"},
+  {id:61, cat:"四、装备与资源", num:61, cn:"大卡车", sw:"Truck", py:"德拉克"},
+  {id:62, cat:"四、装备与资源", num:62, cn:"摩托车", sw:"Dugudugu", py:"杜古杜古"},
+  {id:63, cat:"四、装备与资源", num:63, cn:"对讲机", sw:"Bik", py:"比克"},
+  {id:64, cat:"四、装备与资源", num:64, cn:"手机", sw:"Simu", py:"西姆"},
+  {id:65, cat:"四、装备与资源", num:65, cn:"手电筒", sw:"Torch", py:"托奇"},
+  {id:66, cat:"四、装备与资源", num:66, cn:"钥匙", sw:"Fungulu", py:"风古路"},
+  {id:67, cat:"四、装备与资源", num:67, cn:"汽油", sw:"Essence", py:"艾桑斯"},
+  {id:68, cat:"四、装备与资源", num:68, cn:"柴油", sw:"Mazout", py:"马如特"},
+  {id:69, cat:"四、装备与资源", num:69, cn:"绳子", sw:"Gamba", py:"干巴"},
+  {id:70, cat:"四、装备与资源", num:70, cn:"手铐", sw:"Geragang", py:"哥拉岗"},
+  {id:71, cat:"四、装备与资源", num:71, cn:"灭火器", sw:"Extincteur", py:"艾斯丁特而"},
+  {id:72, cat:"四、装备与资源", num:72, cn:"地图/计划", sw:"Plan", py:"普朗"},
+  {id:73, cat:"四、装备与资源", num:73, cn:"哨子", sw:"Flimbi", py:"夫林比"},
+  {id:74, cat:"四、装备与资源", num:74, cn:"信号", sw:"Lero", py:"雷若"},
+  {id:75, cat:"四、装备与资源", num:75, cn:"电池", sw:"Batterie", py:"巴得里"},
+  {id:76, cat:"五、应急与状态", num:76, cn:"注意/小心", sw:"Attention", py:"阿当雄"},
+  {id:77, cat:"五、应急与状态", num:77, cn:"危险", sw:"Danger", py:"单杰"},
+  {id:78, cat:"五、应急与状态", num:78, cn:"爆炸", sw:"Pasuga", py:"巴苏嘎"},
+  {id:79, cat:"五、应急与状态", num:79, cn:"死亡", sw:"Gufa", py:"古发"},
+  {id:80, cat:"五、应急与状态", num:80, cn:"受伤", sw:"Gilonda", py:"几龙答"},
+  {id:81, cat:"五、应急与状态", num:81, cn:"流血", sw:"Damu", py:"达目"},
+  {id:82, cat:"五、应急与状态", num:82, cn:"情况", sw:"Situation", py:"西提瑞雄"},
+  {id:83, cat:"五、应急与状态", num:83, cn:"错误", sw:"Error", py:"艾来尔"},
+  {id:84, cat:"五、应急与状态", num:84, cn:"偷窃", sw:"Guiba", py:"鬼吧"},
+  {id:85, cat:"五、应急与状态", num:85, cn:"撒谎", sw:"Dewair", py:"德外耳"},
+  {id:86, cat:"五、应急与状态", num:86, cn:"醉酒", sw:"Guliua", py:"古流啊"},
+  {id:87, cat:"五、应急与状态", num:87, cn:"没问题/好", sw:"Sawa", py:"萨瓦"},
+  {id:88, cat:"五、应急与状态", num:88, cn:"不行", sw:"Hapana", py:"哈巴拿"},
+  {id:89, cat:"五、应急与状态", num:89, cn:"结束/完成", sw:"Finish", py:"费内什"},
+  {id:90, cat:"五、应急与状态", num:90, cn:"明白吗？", sw:"Elewa", py:"艾类瓦"},
+  {id:91, cat:"六、协调与日常", num:91, cn:"现在", sw:"Sasa", py:"萨萨"},
+  {id:92, cat:"六、协调与日常", num:92, cn:"今天", sw:"Leo", py:"勒奥"},
+  {id:93, cat:"六、协调与日常", num:93, cn:"明天", sw:"Gexiu", py:"给休"},
+  {id:94, cat:"六、协调与日常", num:94, cn:"昨天", sw:"Jana", py:"加纳"},
+  {id:95, cat:"六、协调与日常", num:95, cn:"晚上", sw:"Musigu", py:"木西古"},
+  {id:96, cat:"六、协调与日常", num:96, cn:"很多", sw:"Minge", py:"民给"},
+  {id:97, cat:"六、协调与日常", num:97, cn:"很少", sw:"Kilogo", py:"齐洛哥"},
+  {id:98, cat:"六、协调与日常", num:98, cn:"谢谢", sw:"Asante", py:"阿桑特"},
+  {id:99, cat:"六、协调与日常", num:99, cn:"你好", sw:"Jambo", py:"江波"},
+  {id:100, cat:"六、协调与日常", num:100, cn:"看看/检查", sw:"Angalia", py:"安格利亚"}
 ];
 
-// 完整100条数据已内置（此处为示例，实际代码完整）
-terms = terms.concat([ /* 完整剩余数据 */ ]); // 实际使用时请补充完整
-
-// ==================== 渲染表格 ====================
+// ==================== 渲染函数 ====================
 function renderTable(data) {
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
@@ -195,31 +244,28 @@ function renderTable(data) {
     const tr = document.createElement('tr');
     tr.className = 'hover:bg-green-50 dark:hover:bg-zinc-800 transition-colors';
     tr.innerHTML = `
-      <td class="px-4 py-4">${item.cat}</td>
-      <td class="px-4 py-4 font-medium">${item.num}</td>
-      <td class="px-4 py-4">${item.cn}</td>
-      <td class="px-4 py-4">${item.sw}</td>
-      <td class="px-4 py-4 font-medium text-green-600 dark:text-green-400">${item.py}</td>
-      <td class="px-4 py-4 text-center">
-        <button onclick="editTerm(${item.id})" class="text-blue-500 hover:text-blue-600 px-2"><i class="fas fa-edit"></i></button>
-        <button onclick="deleteTerm(${item.id})" class="text-red-500 hover:text-red-600 px-2"><i class="fas fa-trash"></i></button>
+      <td class="px-6 py-5 whitespace-nowrap">${item.cat}</td>
+      <td class="px-6 py-5 font-semibold">${item.num}</td>
+      <td class="px-6 py-5">${item.cn}</td>
+      <td class="px-6 py-5">${item.sw}</td>
+      <td class="px-6 py-5 font-medium text-green-600 dark:text-green-400">${item.py}</td>
+      <td class="px-6 py-5 text-center">
+        <button onclick="editTerm(${item.id})" class="text-blue-500 hover:text-blue-600 px-3 text-lg"><i class="fas fa-edit"></i></button>
+        <button onclick="deleteTerm(${item.id})" class="text-red-500 hover:text-red-600 px-3 text-lg"><i class="fas fa-trash"></i></button>
       </td>
     `;
     tbody.appendChild(tr);
   });
 }
 
-// ==================== 搜索和筛选 ====================
+// ==================== 筛选 ====================
 function filterTable() {
-  const search = document.getElementById('searchInput').value.toLowerCase();
+  const search = document.getElementById('searchInput').value.toLowerCase().trim();
   const category = document.getElementById('categoryFilter').value;
   
   let filtered = terms;
-  
-  if (category) {
-    filtered = filtered.filter(t => t.cat === category);
-  }
-  
+
+  if (category) filtered = filtered.filter(t => t.cat === category);
   if (search) {
     filtered = filtered.filter(t => 
       t.cn.toLowerCase().includes(search) ||
@@ -227,7 +273,7 @@ function filterTable() {
       t.py.toLowerCase().includes(search)
     );
   }
-  
+
   renderTable(filtered);
 }
 
@@ -259,31 +305,31 @@ function editTerm(id) {
 
 function saveTerm() {
   const id = document.getElementById('editId').value;
-  const term = {
+  const newTerm = {
     id: id ? parseInt(id) : Date.now(),
-    cat: document.getElementById('catInput').value,
+    cat: document.getElementById('catInput').value.trim(),
     num: parseInt(document.getElementById('numInput').value) || 0,
-    cn: document.getElementById('cnInput').value,
-    sw: document.getElementById('swInput').value,
-    py: document.getElementById('pyInput').value
+    cn: document.getElementById('cnInput').value.trim(),
+    sw: document.getElementById('swInput').value.trim(),
+    py: document.getElementById('pyInput').value.trim()
   };
-  
+
   if (id) {
     const index = terms.findIndex(t => t.id === parseInt(id));
-    if (index !== -1) terms[index] = term;
+    if (index > -1) terms[index] = newTerm;
   } else {
-    terms.push(term);
+    terms.push(newTerm);
   }
-  
-  saveToLocal();
+
+  saveToLocalStorage();
   closeModal();
   filterTable();
 }
 
 function deleteTerm(id) {
-  if (confirm('确定删除这条记录吗？')) {
+  if (confirm('确定要删除这条记录吗？')) {
     terms = terms.filter(t => t.id !== id);
-    saveToLocal();
+    saveToLocalStorage();
     filterTable();
   }
 }
@@ -292,45 +338,40 @@ function closeModal() {
   document.getElementById('modal').classList.add('hidden');
 }
 
-// ==================== 存储 ====================
-function saveToLocal() {
-  localStorage.setItem('security_terms', JSON.stringify(terms));
+// ==================== 本地存储 ====================
+function saveToLocalStorage() {
+  localStorage.setItem('security_terms_100', JSON.stringify(terms));
 }
 
-function loadFromLocal() {
-  const saved = localStorage.getItem('security_terms');
-  if (saved) {
-    terms = JSON.parse(saved);
-  }
+function loadFromLocalStorage() {
+  const saved = localStorage.getItem('security_terms_100');
+  if (saved) terms = JSON.parse(saved);
   renderTable(terms);
 }
 
-// ==================== CSV ====================
+// ==================== CSV 导入导出 ====================
 function exportCSV() {
   let csv = "类别,序号,中文意义,斯瓦希里语/参考词,推荐音译\n";
   terms.forEach(t => {
     csv += `"\( {t.cat}", \){t.num},"\( {t.cn}"," \){t.sw}","${t.py}"\n`;
   });
-  const blob = new Blob([csv], {type: 'text/csv'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = '安全指挥术语.csv';
-  a.click();
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `安全指挥术语_完整版_${new Date().toISOString().slice(0,10)}.csv`;
+  link.click();
 }
 
-function importCSV(event) {
-  const file = event.target.files[0];
+function importCSV(e) {
+  const file = e.target.files[0];
   if (!file) return;
-  
   const reader = new FileReader();
-  reader.onload = function(e) {
-    const text = e.target.result;
-    // 简单CSV解析（可后续优化）
-    const rows = text.split('\n').slice(1);
-    rows.forEach(row => {
+  reader.onload = function(event) {
+    const text = event.target.result;
+    const rows = text.split('\n');
+    rows.slice(1).forEach(row => {
       if (!row.trim()) return;
-      const cols = row.split(',').map(c => c.replace(/"/g, '').trim());
+      const cols = row.split(',').map(c => c.replace(/^"|"$/g, '').trim());
       if (cols.length >= 5) {
         terms.push({
           id: Date.now() + Math.random(),
@@ -342,29 +383,28 @@ function importCSV(event) {
         });
       }
     });
-    saveToLocal();
+    saveToLocalStorage();
     filterTable();
-    alert('导入成功！');
+    alert('✅ CSV 导入成功！');
   };
   reader.readAsText(file);
 }
 
 // ==================== 夜视模式 ====================
-let isNight = false;
+let nightVision = false;
 function toggleNightVision() {
-  isNight = !isNight;
-  if (isNight) {
+  nightVision = !nightVision;
+  if (nightVision) {
     document.body.classList.add('night-vision', 'matrix-bg');
-    document.getElementById('nightBtn').textContent = '关闭夜视';
+    document.getElementById('nightBtn').innerHTML = '🌙 关闭夜视';
   } else {
     document.body.classList.remove('night-vision', 'matrix-bg');
-    document.getElementById('nightBtn').textContent = '夜视模式';
+    document.getElementById('nightBtn').innerHTML = '🌙 夜视模式 ON';
   }
 }
 
-// 初始化
-loadFromLocal();
+// ==================== 初始化 ====================
+loadFromLocalStorage();
 </script>
-
 </body>
 </html>
