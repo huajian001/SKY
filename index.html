@@ -1,949 +1,1056 @@
-```html
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>海外安全官指挥术语系统 v3.4</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>江湖法语速成 · 学习软件</title>
   <style>
-    body { 
-      font-family: 'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, sans-serif; 
-      transition: background-color 0.3s, color 0.3s; 
+    :root {
+      --bg: #0f1419;
+      --card: #1a2332;
+      --card-hover: #243044;
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --accent: #22d3ee;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --border: #334155;
+      --shadow: 0 10px 40px rgba(0,0,0,0.4);
     }
-    
-    /* 战术夜视模式微调 */
-    .night-vision { 
-      background-color: #031403 !important; 
-      color: #00ff41 !important; 
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
     }
-    .night-vision input, .night-vision select, .night-vision textarea { 
-      background-color: #052005 !important; 
-      color: #00ff41 !important; 
-      border-color: #008820 !important; 
+    .app {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 12px 16px 80px;
     }
-    .night-vision button {
-      background-color: #082d08 !important;
-      color: #00ff41 !important;
-      border: 1px solid #00ff41 !important;
+    header {
+      text-align: center;
+      padding: 20px 0 12px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
     }
-    .night-vision button:hover {
-      background-color: #00ff41 !important;
-      color: #031403 !important;
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #60a5fa, #22d3ee);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-    .night-vision .card {
-      background-color: #052005 !important;
-      border: 1px solid #004410 !important;
+    header .sub {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-top: 4px;
     }
-    .night-vision .category-header {
-      background-color: #0a330a !important;
-      color: #00ff41 !important;
-      border-left: 4px solid #00ff41;
-    }
-    
-    /* 常规暗黑模式微调 */
-    .dark .card {
-      background-color: #18181b;
-      border: 1px solid #27272a;
-    }
-    .dark .category-header {
-      background-color: #27272a;
-      color: #e4e4e7;
-      border-left: 4px solid #22c55e;
-    }
-    
-    /* 亮色模式微调 */
-    .category-header {
-      background-color: #f4f4f5;
-      color: #27272a;
-      border-left: 4px solid #15803d;
+    header .badge {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 2px 10px;
+      font-size: 0.75rem;
+      background: rgba(59,130,246,0.2);
+      color: #93c5fd;
+      border-radius: 999px;
     }
 
-    .matrix-bg { 
-      background-image: linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px); 
-      background-size: 20px 20px; 
+    /* Nav */
+    nav {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 8px 0 16px;
+      scrollbar-width: none;
     }
-    
-    /* 移除任何横向滚动的最小宽度限制，100% 容器自适应 */
-    .table-container { 
-      overflow-x: hidden; 
+    nav::-webkit-scrollbar { display: none; }
+    nav button {
+      flex: 0 0 auto;
+      padding: 8px 16px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text-muted);
+      border-radius: 999px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
     }
-    table { 
-      width: 100% !important;
-      table-layout: fixed;
+    nav button.active, nav button:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
     }
-    
-    /* 自定义滚动条 */
-    ::-webkit-scrollbar {
-      width: 4px;
-      height: 4px;
+
+    /* Stats bar */
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
     }
-    ::-webkit-scrollbar-track {
+    .stat { text-align: center; }
+    .stat .num { font-size: 1.3rem; font-weight: 700; color: var(--accent); }
+    .stat .label { font-size: 0.75rem; color: var(--text-muted); }
+
+    /* Card mode */
+    .flash-card {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 36px 24px;
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      position: relative;
+      transition: transform 0.3s;
+    }
+    .flash-card .category {
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      font-size: 0.75rem;
+      color: var(--accent);
+      background: rgba(34,211,238,0.12);
+      padding: 2px 10px;
+      border-radius: 999px;
+    }
+    .flash-card .cn {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .flash-card .fr {
+      font-size: 1.8rem;
+      color: #60a5fa;
+      font-weight: 600;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .flash-card .py {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .flash-card .hint {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    button.btn {
+      padding: 12px 22px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-accent { background: #0891b2; color: white; }
+    .btn-ghost {
       background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
     }
-    ::-webkit-scrollbar-thumb {
-      background: #4b5563;
-      border-radius: 2px;
+    .btn-ghost:hover { background: var(--card-hover); }
+    .btn-success { background: var(--success); color: white; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Quiz */
+    .quiz-question {
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-align: center;
+      margin: 24px 0 20px;
     }
-    .night-vision ::-webkit-scrollbar-thumb {
-      background: #00ff41;
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .option {
+      padding: 14px 18px;
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+    }
+    .option:hover { border-color: var(--primary); background: var(--card-hover); }
+    .option.correct { border-color: var(--success); background: rgba(34,197,94,0.15); }
+    .option.wrong { border-color: var(--danger); background: rgba(239,68,68,0.15); }
+    .option.disabled { pointer-events: none; }
+
+    /* List */
+    .search-box {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-size: 1rem;
+      margin-bottom: 12px;
+    }
+    .filter-row {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      margin-bottom: 12px;
+      padding-bottom: 4px;
+    }
+    .filter-row button {
+      flex: 0 0 auto;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .filter-row button.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    .word-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .word-item {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .word-item .left { flex: 1; min-width: 0; }
+    .word-item .cn { font-weight: 600; font-size: 1.05rem; }
+    .word-item .fr { color: #60a5fa; font-size: 0.95rem; }
+    .word-item .py { color: var(--text-muted); font-size: 0.85rem; }
+    .word-item .speak-btn {
+      background: rgba(59,130,246,0.2);
+      border: none;
+      color: #93c5fd;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* About */
+    .about {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      line-height: 1.7;
+    }
+    .about h2 { margin-bottom: 12px; color: var(--accent); }
+    .about p { margin-bottom: 10px; color: var(--text-muted); }
+    .about ul { padding-left: 20px; color: var(--text-muted); }
+    .about li { margin-bottom: 6px; }
+
+    /* Progress */
+    .progress-bar {
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 12px 0;
+    }
+    .progress-bar .fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      transition: width 0.3s;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .score-banner {
+      text-align: center;
+      padding: 16px;
+      background: var(--card);
+      border-radius: 12px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+    }
+    .score-banner .big { font-size: 2rem; font-weight: 700; color: var(--accent); }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(15,20,25,0.95);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--border);
+      padding: 10px 16px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
     }
   </style>
 </head>
-<body class="bg-zinc-50 dark:bg-zinc-950 text-zinc-800 dark:text-zinc-100 min-h-screen pb-12 transition-colors duration-300">
+<body>
+  <div class="app">
+    <header>
+      <h1>江湖法语速成</h1>
+      <div class="sub">Le français facile · 口语学习软件</div>
+      <div class="badge">专为工地 / 生活场景打造</div>
+    </header>
 
-  <!-- 自定义提示框容器 -->
-  <div id="toastContainer" class="fixed top-5 right-5 z-[200] space-y-3 pointer-events-none"></div>
+    <nav id="nav">
+      <button data-mode="card" class="active">📇 卡片</button>
+      <button data-mode="quiz">📝 测验</button>
+      <button data-mode="list">📚 单词本</button>
+      <button data-mode="about">ℹ️ 关于</button>
+    </nav>
 
-  <!-- 自定义确认弹窗 -->
-  <div id="confirmModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[150] backdrop-blur-sm">
-    <div class="bg-white dark:bg-zinc-900 border dark:border-zinc-800 rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl">
-      <h3 id="confirmTitle" class="text-lg font-bold mb-2">提示</h3>
-      <p id="confirmMessage" class="text-zinc-600 dark:text-zinc-400 text-sm mb-6"></p>
-      <div class="flex justify-end gap-3">
-        <button id="confirmCancelBtn" class="px-4 py-2 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl text-sm transition-all">取消</button>
-        <button id="confirmOkBtn" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm transition-all">确定</button>
-      </div>
+    <div class="stats" id="stats">
+      <div class="stat"><div class="num" id="stat-total">0</div><div class="label">总词汇</div></div>
+      <div class="stat"><div class="num" id="stat-learned">0</div><div class="label">已掌握</div></div>
+      <div class="stat"><div class="num" id="stat-score">0</div><div class="label">测验正确</div></div>
     </div>
+
+    <main id="main"></main>
   </div>
 
-  <div class="max-w-4xl mx-auto px-2 sm:px-6 py-4 sm:py-6">
-    <!-- 头部导航与标题 -->
-    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-5">
-      <h1 id="appTitle" class="text-xl sm:text-2xl font-extrabold flex items-center gap-2 text-green-700 dark:text-green-400 tracking-wider">
-        <i class="fas fa-shield-halved animate-pulse"></i> 海外安全官指挥术语系统
-        <span class="text-[10px] px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-800">v3.4</span>
-      </h1>
-      <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-        <button onclick="startExam()" class="flex-1 sm:flex-initial px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 shadow-lg shadow-amber-600/10 transition-all transform active:scale-95">
-          <i class="fas fa-graduation-cap"></i> <span data-i18n="startExam">开始考试</span>
-        </button>
-        <button onclick="toggleSettings()" class="px-3.5 py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all">
-          <i class="fas fa-cog"></i> <span class="hidden md:inline" data-i18n="systemSettings">设置</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- 系统设置悬浮面板 -->
-    <div id="settingsPanel" class="hidden absolute right-4 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl p-5 w-72 z-50 border border-zinc-200 dark:border-zinc-800 transition-all">
-      <div class="flex justify-between items-center mb-4 pb-2 border-b dark:border-zinc-800">
-        <h3 class="font-bold text-sm flex items-center gap-2">⚙️ <span data-i18n="systemSettings">系统设置</span></h3>
-        <button onclick="toggleSettings()" class="text-zinc-400 hover:text-zinc-600"><i class="fas fa-times"></i></button>
-      </div>
-      <div class="space-y-4">
-        <div>
-          <label class="block text-xs text-zinc-500 dark:text-zinc-400 mb-2" data-i18n="themeMode">主题模式</label>
-          <div class="grid grid-cols-3 gap-2">
-            <button onclick="setTheme(0)" id="themeBtn0" class="py-2 text-[11px] rounded-lg border dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 font-medium hover:border-green-500 transition-all">☀️ 亮色</button>
-            <button onclick="setTheme(1)" id="themeBtn1" class="py-2 text-[11px] rounded-lg border dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 font-medium hover:border-green-500 transition-all">🌙 暗黑</button>
-            <button onclick="setTheme(2)" id="themeBtn2" class="py-2 text-[11px] rounded-lg border dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 font-medium hover:border-green-500 transition-all">🌲 夜视</button>
-          </div>
-        </div>
-        <div>
-          <label class="block text-xs text-zinc-500 dark:text-zinc-400 mb-2" data-i18n="interfaceLang">界面语言</label>
-          <div class="grid grid-cols-2 gap-2">
-            <button onclick="switchLang('zh')" id="langBtnZh" class="py-1.5 text-xs rounded-lg border dark:border-zinc-800 hover:border-green-500 transition-all">中文</button>
-            <button onclick="switchLang('en')" id="langBtnEn" class="py-1.5 text-xs rounded-lg border dark:border-zinc-800 hover:border-green-500 transition-all">English</button>
-          </div>
-        </div>
-        <div class="pt-2 border-t dark:border-zinc-800 flex flex-col gap-2">
-          <button onclick="restoreDefaults()" class="w-full py-2 text-xs bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg transition-all">
-            <i class="fas fa-rotate"></i> <span data-i18n="restoreDefault">恢复默认数据</span>
-          </button>
-          <button onclick="fakeCloudSync()" class="w-full py-2 text-xs bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-all">
-            <i class="fas fa-cloud-arrow-up"></i> <span data-i18n="cloudSync">数据备份 (CSV)</span>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 工具控制栏 -->
-    <div class="card bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800/80 p-3 mb-4 flex flex-col gap-2">
-      <div class="relative w-full">
-        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-zinc-400 pointer-events-none">
-          <i class="fas fa-search text-xs"></i>
-        </span>
-        <input type="text" id="searchInput" placeholder="搜索 中文 / 拼音 / 斯瓦希里语..." onkeyup="filterTable()" 
-               class="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-zinc-950 transition-all" />
-      </div>
-      
-      <div class="flex gap-2">
-        <select id="categoryFilter" onchange="filterTable()" class="flex-1 min-w-[110px] px-2 py-2.5 text-xs rounded-xl border border-zinc-200 dark:border-zinc-800 dark:bg-zinc-950 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all">
-          <option value="" data-i18n="allCategory">全部分类</option>
-          <option value="一、指挥与身份">一、指挥与身份</option>
-          <option value="二、行动指令">二、行动指令</option>
-          <option value="三、战术方位">三、战术方位</option>
-          <option value="四、装备与资源">四、装备与资源</option>
-          <option value="五、应急与状态">五、应急与状态</option>
-          <option value="六、协调与日常">六、协调与日常</option>
-        </select>
-
-        <div class="flex gap-1.5">
-          <button onclick="showAddModal()" class="px-3 py-2.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-1 transition-all">
-            <i class="fas fa-plus"></i> <span data-i18n="addBtn">新增</span>
-          </button>
-          <button onclick="exportCSV()" class="p-2.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 text-xs rounded-xl flex items-center justify-center transition-all" title="导出CSV">
-            <i class="fas fa-file-export"></i>
-          </button>
-          <button onclick="document.getElementById('importFile').click()" class="p-2.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 text-xs rounded-xl flex items-center justify-center transition-all" title="导入CSV">
-            <i class="fas fa-file-import"></i>
-          </button>
-          <input type="file" id="importFile" accept=".csv" class="hidden" onchange="importCSV(event)">
-        </div>
-      </div>
-    </div>
-
-    <!-- 数据表格 (彻底自适应，缩短所有间距，不产生滑动条) -->
-    <div class="card bg-white dark:bg-zinc-900 rounded-2xl shadow-md border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-      <div class="table-container">
-        <table class="w-full text-xs text-left" id="dataTable">
-          <thead class="bg-zinc-50 dark:bg-zinc-800/80 text-[10px] uppercase text-zinc-400 dark:text-zinc-500 border-b dark:border-zinc-800">
-            <tr>
-              <!-- 精确分配百分比，确保无滚动条完整容纳 -->
-              <th class="px-1.5 py-3 text-center w-[8%] font-semibold" data-i18n="thNo">序号</th>
-              <th class="px-1.5 py-3 w-[32%] font-semibold" data-i18n="thCn">中文意义</th>
-              <th class="px-1.5 py-3 w-[30%] font-semibold" data-i18n="thSw">斯瓦希里语</th>
-              <th class="px-1.5 py-3 w-[22%] font-semibold" data-i18n="thPy">推荐音译</th>
-              <th class="px-1.5 py-3 text-center w-[8%] font-semibold" data-i18n="thAction">操作</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody" class="divide-y divide-zinc-100 dark:divide-zinc-800/60"></tbody>
-        </table>
-      </div>
-      <div id="noDataView" class="hidden flex flex-col items-center justify-center py-12 text-zinc-400">
-        <i class="fas fa-folder-open text-3xl mb-2"></i>
-        <p class="text-xs" data-i18n="noData">未找到匹配的战术术语</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- 考试模态框 -->
-  <div id="examModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100] backdrop-blur-sm">
-    <div class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-sm mx-4 shadow-2xl border dark:border-zinc-800 overflow-hidden">
-      <div class="p-4 border-b dark:border-zinc-800 flex justify-between items-center bg-zinc-50 dark:bg-zinc-800/50">
-        <h2 class="text-sm font-bold flex items-center gap-1.5 text-green-700 dark:text-green-400">
-          <i class="fas fa-graduation-cap"></i> <span data-i18n="examTitle">安全官指挥术语考核</span>
-        </h2>
-        <div class="flex items-center gap-3">
-          <span id="examScore" class="font-black text-base text-green-600">0 分</span>
-          <span id="examProgress" class="font-mono text-xs px-2 py-0.5 bg-zinc-200 dark:bg-zinc-800 rounded-lg">1/10</span>
-        </div>
-      </div>
-      <div class="p-6 min-h-[180px] flex flex-col justify-center" id="examContent">
-        <!-- 动态生成考试题目 -->
-      </div>
-      <div class="p-3 border-t dark:border-zinc-800 flex gap-2 bg-zinc-50 dark:bg-zinc-800/30">
-        <button onclick="exitExam()" class="flex-1 py-2 border dark:border-zinc-700 rounded-lg text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all">
-          <span data-i18n="exitBtn">退出</span>
-        </button>
-        <button id="examActionBtn" onclick="submitExamAnswer()" class="flex-1 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-semibold shadow-md shadow-green-600/10 transition-all">
-          <span data-i18n="submitBtn">提交答案</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 新增/编辑弹窗 -->
-  <div id="modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm">
-    <div class="bg-white dark:bg-zinc-900 rounded-2xl p-5 w-full max-w-xs mx-4 shadow-2xl border dark:border-zinc-800">
-      <h2 id="modalTitle" class="text-base font-bold mb-3 flex items-center gap-1.5">
-        <i class="fas fa-edit text-green-600 text-sm"></i> 新增术语
-      </h2>
-      <input type="hidden" id="editId">
-      <div class="space-y-3">
-        <div>
-          <label class="block text-[10px] font-semibold text-zinc-400 mb-0.5">类别</label>
-          <select id="catInput" class="w-full px-3 py-2 text-xs border dark:border-zinc-800 dark:bg-zinc-950 rounded-lg focus:ring-2 focus:ring-green-500">
-            <option value="一、指挥与身份">一、指挥与身份</option>
-            <option value="二、行动指令">二、行动指令</option>
-            <option value="三、战术方位">三、战术方位</option>
-            <option value="四、装备与资源">四、装备与资源</option>
-            <option value="五、应急与状态">五、应急与状态</option>
-            <option value="六、协调与日常">六、协调与日常</option>
-          </select>
-        </div>
-        <div class="grid grid-cols-3 gap-2">
-          <div class="col-span-1">
-            <label class="block text-[10px] font-semibold text-zinc-400 mb-0.5">序号</label>
-            <input id="numInput" type="number" class="w-full px-3 py-2 text-xs border dark:border-zinc-800 dark:bg-zinc-950 rounded-lg focus:ring-2 focus:ring-green-500">
-          </div>
-          <div class="col-span-2">
-            <label class="block text-[10px] font-semibold text-zinc-400 mb-0.5">中文意义</label>
-            <input id="cnInput" type="text" class="w-full px-3 py-2 text-xs border dark:border-zinc-800 dark:bg-zinc-950 rounded-lg focus:ring-2 focus:ring-green-500">
-          </div>
-        </div>
-        <div>
-          <label class="block text-[10px] font-semibold text-zinc-400 mb-0.5">斯瓦希里语</label>
-          <input id="swInput" type="text" class="w-full px-3 py-2 text-xs border dark:border-zinc-800 dark:bg-zinc-950 rounded-lg focus:ring-2 focus:ring-green-500">
-        </div>
-        <div>
-          <label class="block text-[10px] font-semibold text-zinc-400 mb-0.5">推荐音译</label>
-          <input id="pyInput" type="text" class="w-full px-3 py-2 text-xs border dark:border-zinc-800 dark:bg-zinc-950 rounded-lg focus:ring-2 focus:ring-green-500">
-        </div>
-      </div>
-      <div class="flex gap-2 mt-4">
-        <button onclick="closeModal()" class="flex-1 py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-xs font-semibold transition-all">取消</button>
-        <button onclick="saveTerm()" class="flex-1 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-semibold shadow-lg shadow-green-600/10 transition-all">保存</button>
-      </div>
-    </div>
-  </div>
+  <footer>江湖法语速成 · 基于《法语口语学习》PDF 制作 · 离线可用</footer>
 
   <script>
-    // ==================== 100条基础数据 (严格 1-100 序号物理排序) ====================
-    const DEFAULT_TERMS = [
-      {id:1, cat:"一、指挥与身份", num:1, cn:"领导/首长", sw:"Boss", py:"波丝"},
-      {id:2, cat:"一、指挥与身份", num:2, cn:"警察", sw:"Polisi", py:"波利斯"},
-      {id:3, cat:"一、指挥与身份", num:3, cn:"军人", sw:"Soldat", py:"索哒"},
-      {id:4, cat:"一、指挥与身份", num:4, cn:"保安", sw:"Shei", py:"谢义"},
-      {id:5, cat:"一、指挥与身份", num:5, cn:"我", sw:"Miye", py:"米也"},
-      {id:6, cat:"一、指挥与身份", num:6, cn:"你", sw:"Wei", py:"微"},
-      {id:7, cat:"一、指挥与身份", num:7, cn:"他", sw:"Wuyou", py:"无有"},
-      {id:8, cat:"一、指挥与身份", num:8, cn:"刚果人", sw:"Congoli", py:"刚果里"},
-      {id:9, cat:"一、指挥与身份", num:9, cn:"外国人", sw:"Bazungu", py:"巴容古"},
-      {id:10, cat:"一、指挥与身份", num:10, cn:"姓名", sw:"Nom", py:"农"},
-      {id:11, cat:"一、指挥与身份", num:11, cn:"身份证", sw:"ID", py:"埃迪"},
-      {id:12, cat:"一、指挥与身份", num:12, cn:"护照", sw:"Passeport", py:"帕斯报特"},
-      {id:13, cat:"一、指挥与身份", num:13, cn:"签字", sw:"Signer", py:"新艳"},
-      {id:14, cat:"一、指挥与身份", num:14, cn:"盖章", sw:"Cachet", py:"嘎谢"},
-      {id:15, cat:"一、指挥与身份", num:15, cn:"组织/团伙", sw:"Group", py:"古鲁普"},
-      {id:16, cat:"二、行动指令", num:16, cn:"过来", sw:"Guya", py:"古雅"},
-      {id:17, cat:"二、行动指令", num:17, cn:"走/离开", sw:"Dembia", py:"点必亚"},
-      {id:18, cat:"二、行动指令", num:18, cn:"停止/站住", sw:"Simama", py:"西马马"},
-      {id:19, cat:"二、行动指令", num:19, cn:"别动", sw:"Guigala", py:"规嘎拉"},
-      {id:20, cat:"二、行动指令", num:20, cn:"坐下", sw:"Igara", py:"以嘎拉"},
-      {id:21, cat:"二、行动指令", num:21, cn:"起来", sw:"Selewei", py:"塞来为"},
-      {id:22, cat:"二、行动指令", num:22, cn:"进去", sw:"Gunjia", py:"滚几亚"},
-      {id:23, cat:"二、行动指令", num:23, cn:"出来", sw:"Toka", py:"到嘎"},
-      {id:24, cat:"二、行动指令", num:24, cn:"放下", sw:"Lebo/Wega", py:"来博"},
-      {id:25, cat:"二、行动指令", num:25, cn:"拿起/提着", sw:"Beba", py:"贝巴"},
-      {id:26, cat:"二、行动指令", num:26, cn:"快点", sw:"Fast", py:"法斯特"},
-      {id:27, cat:"二、行动指令", num:27, cn:"慢点", sw:"Bolebole", py:"波累波累"},
-      {id:28, cat:"二、行动指令", num:28, cn:"等一下", sw:"Adang", py:"阿当"},
-      {id:29, cat:"二、行动指令", num:29, cn:"集合", sw:"Pode", py:"抱得"},
-      {id:30, cat:"二、行动指令", num:30, cn:"跟着", sw:"Gogoda", py:"过过大"},
-      {id:31, cat:"二、行动指令", num:31, cn:"返回", sw:"Revenir", py:"雷维尼尔"},
-      {id:32, cat:"二、行动指令", num:32, cn:"回去", sw:"Retourner", py:"雷度尔内"},
-      {id:33, cat:"二、行动指令", num:33, cn:"寻找/搜查", sw:"Dafuta", py:"达扶答"},
-      {id:34, cat:"二、行动指令", num:34, cn:"抓捕", sw:"Gubamba", py:"古邦巴"},
-      {id:35, cat:"二、行动指令", num:35, cn:"蹲下", sw:"Shusa", py:"羞莎"},
-      {id:36, cat:"三、战术方位", num:36, cn:"前面", sw:"Mbele", py:"工贝里"},
-      {id:37, cat:"三、战术方位", num:37, cn:"后面", sw:"Mugongo", py:"莫刚哥"},
-      {id:38, cat:"三、战术方位", num:38, cn:"左边", sw:"Goshi", py:"果西"},
-      {id:39, cat:"三、战术方位", num:39, cn:"右边", sw:"Tolashi", py:"托拉西"},
-      {id:40, cat:"三、战术方位", num:40, cn:"上面", sw:"Yulu", py:"尤路"},
-      {id:41, cat:"三、战术方位", num:41, cn:"下面", sw:"Jini", py:"基尼"},
-      {id:42, cat:"三、战术方位", num:42, cn:"这里", sw:"Aba", py:"阿巴"},
-      {id:43, cat:"三、战术方位", num:43, cn:"那里", sw:"Pale", py:"巴雷"},
-      {id:44, cat:"三、战术方位", num:44, cn:"里面", sw:"Mangara", py:"忙嘎拉"},
-      {id:45, cat:"三、战术方位", num:45, cn:"外面", sw:"Gera", py:"给拉"},
-      {id:46, cat:"三、战术方位", num:46, cn:"中间", sw:"Gajigaji", py:"嘎几嘎急"},
-      {id:47, cat:"三、战术方位", num:47, cn:"旁边", sw:"Gombe", py:"工贝"},
-      {id:48, cat:"三、战术方位", num:48, cn:"北", sw:"North", py:"诺斯"},
-      {id:49, cat:"三、战术方位", num:49, cn:"南", sw:"South", py:"色德"},
-      {id:50, cat:"三、战术方位", num:50, cn:"东", sw:"East", py:"爱斯特"},
-      {id:51, cat:"三、战术方位", num:51, cn:"西", sw:"West", py:"威斯特"},
-      {id:52, cat:"三、战术方位", num:52, cn:"城市", sw:"Ville", py:"维勒"},
-      {id:53, cat:"三、战术方位", num:53, cn:"马路", sw:"Balabala", py:"巴拉巴拉"},
-      {id:54, cat:"三、战术方位", num:54, cn:"桥", sw:"Jilalou", py:"几拉漏"},
-      {id:55, cat:"三、战术方位", num:55, cn:"围墙", sw:"Bida", py:"比达"},
-      {id:56, cat:"四、装备与资源", num:56, cn:"步枪", sw:"Munonge", py:"布顿给"},
-      {id:57, cat:"四、装备与资源", num:57, cn:"手枪/枪", sw:"Munduge", py:"木冬给"},
-      {id:58, cat:"四、装备与资源", num:58, cn:"坦克", sw:"Shaletegomba", py:"夏雷得供巴"},
-      {id:59, cat:"四、装备与资源", num:59, cn:"大炮", sw:"Bangmu", py:"帮木"},
-      {id:60, cat:"四、装备与资源", num:60, cn:"汽车", sw:"Motoga", py:"莫道嘎"},
-      {id:61, cat:"四、装备与资源", num:61, cn:"大卡车", sw:"Truck", py:"德拉克"},
-      {id:62, cat:"四、装备与资源", num:62, cn:"摩托车", sw:"Dugudugu", py:"杜古杜古"},
-      {id:63, cat:"四、装备与资源", num:63, cn:"对讲机", sw:"Bik", py:"比克"},
-      {id:64, cat:"四、装备与资源", num:64, cn:"手机", sw:"Simu", py:"西姆"},
-      {id:65, cat:"四、装备与资源", num:65, cn:"手电筒", sw:"Torch", py:"托奇"},
-      {id:66, cat:"四、装备与资源", num:66, cn:"钥匙", sw:"Fungulu", py:"风古路"},
-      {id:67, cat:"四、装备与资源", num:67, cn:"汽油", sw:"Essence", py:"艾桑斯"},
-      {id:68, cat:"四、装备与资源", num:68, cn:"柴油", sw:"Mazout", py:"马如特"},
-      {id:69, cat:"四、装备与资源", num:69, cn:"绳子", sw:"Gamba", py:"干巴"},
-      {id:70, cat:"四、装备与资源", num:70, cn:"手铐", sw:"Geragang", py:"哥拉岗"},
-      {id:71, cat:"四、装备与资源", num:71, cn:"灭火器", sw:"Extincteur", py:"艾斯丁特而"},
-      {id:72, cat:"四、装备与资源", num:72, cn:"地图/计划", sw:"Plan", py:"普朗"},
-      {id:73, cat:"四、装备与资源", num:73, cn:"哨子", sw:"Flimbi", py:"夫林比"},
-      {id:74, cat:"四、装备与资源", num:74, cn:"信号", sw:"Lero", py:"雷若"},
-      {id:75, cat:"四、装备与资源", num:75, cn:"电池", sw:"Batterie", py:"巴得里"},
-      {id:76, cat:"五、应急与状态", num:76, cn:"注意/小心", sw:"Attention", py:"阿当雄"},
-      {id:77, cat:"五、应急与状态", num:77, cn:"危险", sw:"Danger", py:"单杰"},
-      {id:78, cat:"五、应急与状态", num:78, cn:"爆炸", sw:"Pasuga", py:"巴苏嘎"},
-      {id:79, cat:"五、应急与状态", num:79, cn:"死亡", sw:"Gufa", py:"古发"},
-      {id:80, cat:"五、应急与状态", num:80, cn:"受伤", sw:"Gilonda", py:"几龙答"},
-      {id:81, cat:"五、应急与状态", num:81, cn:"流血", sw:"Damu", py:"达目"},
-      {id:82, cat:"五(" + "应急与状态", num:82, cn:"情况", sw:"Situation", py:"西提瑞雄"},
-      {id:83, cat:"五、应急与状态", num:83, cn:"错误", sw:"Error", py:"艾来尔"},
-      {id:84, cat:"五、应急与状态", num:84, cn:"偷窃", sw:"Guiba", py:"鬼吧"},
-      {id:85, cat:"五、应急与状态", num:85, cn:"撒谎", sw:"Dewair", py:"德外耳"},
-      {id:86, cat:"五、应急与状态", num:86, cn:"醉酒", sw:"Guliua", py:"古流啊"},
-      {id:87, cat:"五、应急与状态", num:87, cn:"没问题/好", sw:"Sawa", py:"萨瓦"},
-      {id:88, cat:"五、应急与状态", num:88, cn:"不行", sw:"Hapana", py:"哈巴拿"},
-      {id:89, cat:"五、应急与状态", num:89, cn:"结束/完成", sw:"Finish", py:"费内什"},
-      {id:90, cat:"五、应急与状态", num:90, cn:"明白吗？", sw:"Elewa", py:"艾类瓦"},
-      {id:91, cat:"六、协调与日常", num:91, cn:"现在", sw:"Sasa", py:"萨萨"},
-      {id:92, cat:"六、协调与日常", num:92, cn:"今天", sw:"Leo", py:"勒奥"},
-      {id:93, cat:"六、协调与日常", num:93, cn:"明天", sw:"Gexiu", py:"给休"},
-      {id:94, cat:"六、协调与日常", num:94, cn:"昨天", sw:"Jana", py:"加纳"},
-      {id:95, cat:"六、协调与日常", num:95, cn:"晚上", sw:"Musigu", py:"木西古"},
-      {id:96, cat:"六、协调与日常", num:96, cn:"很多", sw:"Minge", py:"民给"},
-      {id:97, cat:"六、协调与日常", num:97, cn:"很少", sw:"Kilogo", py:"齐洛哥"},
-      {id:98, cat:"六、协调与日常", num:98, cn:"谢谢", sw:"Asante", py:"阿桑特"},
-      {id:99, cat:"六、协调与日常", num:99, cn:"你好", sw:"Jambo", py:"江波"},
-      {id:100, cat:"六、协调与日常", num:100, cn:"看看/检查", sw:"Angalia", py:"安格利亚"}
+    // ========== 词汇数据（从 PDF 提取并轻度校正法语拼写） ==========
+    const VOCAB = [
+      // 代词
+      { cn: "你", fr: "toi", py: "特哇", cat: "代词" },
+      { cn: "我", fr: "moi", py: "母哇", cat: "代词" },
+      { cn: "他", fr: "lui", py: "绿", cat: "代词" },
+      { cn: "她", fr: "elle", py: "爱了", cat: "代词" },
+      { cn: "他们 / 她们 / 它们", fr: "eux", py: "额", cat: "代词" },
+
+      // 时间
+      { cn: "工地", fr: "chantier", py: "商体也", cat: "时间地点" },
+      { cn: "前天", fr: "avant-hier", py: "阿旺叶赫", cat: "时间地点" },
+      { cn: "昨天", fr: "hier", py: "叶赫", cat: "时间地点" },
+      { cn: "今天", fr: "aujourd'hui", py: "哦如何最", cat: "时间地点" },
+      { cn: "明天", fr: "demain", py: "得慢", cat: "时间地点" },
+      { cn: "后天", fr: "après-demain", py: "阿婆害得慢", cat: "时间地点" },
+      { cn: "几月？", fr: "quel mois ?", py: "该了姆瓦", cat: "时间地点" },
+      { cn: "几日？", fr: "quel jour ?", py: "该了如何", cat: "时间地点" },
+      { cn: "几点钟？", fr: "Quelle heure est-il ?", py: "该了和爱地了", cat: "时间地点" },
+      { cn: "几个小时？", fr: "Combien d'heures ?", py: "共边德和", cat: "时间地点" },
+      { cn: "几天？", fr: "Combien de jours ?", py: "共边德如何", cat: "时间地点" },
+      { cn: "几月？", fr: "Combien de mois ?", py: "共边德姆瓦", cat: "时间地点" },
+      { cn: "几个人？", fr: "Combien de personnes ?", py: "共边德百和送了", cat: "时间地点" },
+      { cn: "上午", fr: "matin / avant-midi", py: "马但 / 阿往米第", cat: "时间地点" },
+      { cn: "中午", fr: "midi", py: "米第", cat: "时间地点" },
+      { cn: "下午", fr: "après-midi", py: "阿婆青米第", cat: "时间地点" },
+      { cn: "晚上", fr: "soir", py: "斯哇赫", cat: "时间地点" },
+      { cn: "夜", fr: "nuit", py: "女", cat: "时间地点" },
+      { cn: "夜班", fr: "équipe de nuit", py: "唉给扑德女", cat: "时间地点" },
+      { cn: "年", fr: "an", py: "昂", cat: "时间地点" },
+      { cn: "月", fr: "mois", py: "亩瓦", cat: "时间地点" },
+      { cn: "日", fr: "jour", py: "入何", cat: "时间地点" },
+      { cn: "小时", fr: "heure", py: "哦赫", cat: "时间地点" },
+
+      // 数字
+      { cn: "一", fr: "un", py: "盎", cat: "数字" },
+      { cn: "二", fr: "deux", py: "的", cat: "数字" },
+      { cn: "三", fr: "trois", py: "特话", cat: "数字" },
+      { cn: "四", fr: "quatre", py: "嘎特和", cat: "数字" },
+      { cn: "五", fr: "cinq", py: "散可", cat: "数字" },
+      { cn: "六", fr: "six", py: "瑟斯", cat: "数字" },
+      { cn: "七", fr: "sept", py: "赛特", cat: "数字" },
+      { cn: "八", fr: "huit", py: "鱼特", cat: "数字" },
+      { cn: "九", fr: "neuf", py: "呢未", cat: "数字" },
+      { cn: "十", fr: "dix", py: "第斯", cat: "数字" },
+      { cn: "十一", fr: "onze", py: "昂子", cat: "数字" },
+      { cn: "十二", fr: "douze", py: "肚子", cat: "数字" },
+      { cn: "十三", fr: "treize", py: "特雷子", cat: "数字" },
+      { cn: "十四", fr: "quatorze", py: "嘎躲赫子", cat: "数字" },
+      { cn: "十五", fr: "quinze", py: "干子", cat: "数字" },
+      { cn: "十六", fr: "seize", py: "赛子", cat: "数字" },
+      { cn: "二十", fr: "vingt", py: "万", cat: "数字" },
+      { cn: "三十", fr: "trente", py: "特夯特", cat: "数字" },
+      { cn: "四十", fr: "quarante", py: "嘎夯特", cat: "数字" },
+      { cn: "五十", fr: "cinquante", py: "三缸特", cat: "数字" },
+      { cn: "六十", fr: "soixante", py: "斯哇桑特", cat: "数字" },
+      { cn: "七十", fr: "septante", py: "瑟普当特", cat: "数字" },
+      { cn: "八十", fr: "quatre-vingt", py: "嘎特赫万", cat: "数字" },
+      { cn: "九十", fr: "nonante", py: "呢忘特", cat: "数字" },
+      { cn: "百", fr: "cent", py: "桑", cat: "数字" },
+      { cn: "千", fr: "mille", py: "米了", cat: "数字" },
+      { cn: "万", fr: "dix mille", py: "地米了", cat: "数字" },
+      { cn: "十万", fr: "cent mille", py: "桑米了", cat: "数字" },
+      { cn: "百万", fr: "un million", py: "米粒用", cat: "数字" },
+
+      // 尺寸
+      { cn: "长度", fr: "longueur", py: "聋个赫", cat: "尺寸" },
+      { cn: "宽度", fr: "largeur", py: "拉赫热赫", cat: "尺寸" },
+      { cn: "高度", fr: "hauteur", py: "哦的赫", cat: "尺寸" },
+      { cn: "厚度", fr: "épaisseur", py: "送拜色赫", cat: "尺寸" },
+      { cn: "平方米", fr: "mètre carré", py: "卖特赫嘎黑", cat: "尺寸" },
+      { cn: "立方米", fr: "mètre cube", py: "卖特赫贵布", cat: "尺寸" },
+      { cn: "厘米", fr: "centimètre", py: "桑迪迈特赫", cat: "尺寸" },
+      { cn: "米", fr: "mètre", py: "迈特赫", cat: "尺寸" },
+      { cn: "公里", fr: "kilomètre", py: "各洛迈特赫", cat: "尺寸" },
+      { cn: "大", fr: "grand", py: "各行", cat: "尺寸" },
+      { cn: "小", fr: "petit", py: "伯迪", cat: "尺寸" },
+      { cn: "粗", fr: "gros", py: "格货", cat: "尺寸" },
+      { cn: "细", fr: "mince", py: "慢斯", cat: "尺寸" },
+      { cn: "深", fr: "profond", py: "朴和封", cat: "尺寸" },
+      { cn: "浅", fr: "peu profond", py: "臂朴和封", cat: "尺寸" },
+
+      // 月份
+      { cn: "一月", fr: "janvier", py: "3vje", cat: "月份" },
+      { cn: "二月", fr: "février", py: "fevrije", cat: "月份" },
+      { cn: "三月", fr: "mars", py: "mars", cat: "月份" },
+      { cn: "四月", fr: "avril", py: "avril", cat: "月份" },
+      { cn: "五月", fr: "mai", py: "me", cat: "月份" },
+      { cn: "六月", fr: "juin", py: "3uɛ", cat: "月份" },
+      { cn: "七月", fr: "juillet", py: "3ujjɛ", cat: "月份" },
+      { cn: "八月", fr: "août", py: "u(t)", cat: "月份" },
+      { cn: "九月", fr: "septembre", py: "septãbr", cat: "月份" },
+      { cn: "十月", fr: "octobre", py: "ɔktɔbr", cat: "月份" },
+      { cn: "十一月", fr: "novembre", py: "nɔvãbr", cat: "月份" },
+      { cn: "十二月", fr: "décembre", py: "desãbr", cat: "月份" },
+
+      // 工程机械
+      { cn: "推土机", fr: "bouteur / bull", py: "布德赫", cat: "工程机械" },
+      { cn: "装载机", fr: "chargeur", py: "夏赫热赫", cat: "工程机械" },
+      { cn: "反铲", fr: "pelle", py: "败了", cat: "工程机械" },
+      { cn: "平地机", fr: "niveleuse", py: "呢瓦乐子", cat: "工程机械" },
+      { cn: "拌和机", fr: "malaxeur", py: "嘛拉科瑟赫", cat: "工程机械" },
+      { cn: "砼搅拌机", fr: "bétonnière", py: "被冻捏赫", cat: "工程机械" },
+      { cn: "单钢轮压路机", fr: "compacteur d'un rouleau", py: "共把科特赫安呼落", cat: "工程机械" },
+      { cn: "双钢轮压路机", fr: "compacteur de 2 rouleaux", py: "共把科特赫德德呼落", cat: "工程机械" },
+      { cn: "三钢轮压路机", fr: "compacteur de 3 rouleaux", py: "共把科特赫德特赫哇呼落", cat: "工程机械" },
+      { cn: "手扶震动碾", fr: "compacteur vibrant à main", py: "共把科德赫维布航阿慢", cat: "工程机械" },
+      { cn: "轮胎压路机", fr: "compacteur à pneu", py: "共把科德赫阿扑呢", cat: "工程机械" },
+      { cn: "自卸汽车", fr: "benne basculante", py: "拜呢把斯规郎", cat: "工程机械" },
+      { cn: "吊车", fr: "grue sur camion", py: "格会随和嘎米水", cat: "工程机械" },
+      { cn: "皮卡车", fr: "pick-up", py: "皮卡", cat: "工程机械" },
+      { cn: "洒水车", fr: "arroseuse", py: "阿洛则姿", cat: "工程机械" },
+      { cn: "加油车", fr: "camion à ravitailler", py: "嘎米水阿哈维搭也", cat: "工程机械" },
+      { cn: "空压车", fr: "compresseur", py: "共坡还瑟赫", cat: "工程机械" },
+      { cn: "钻机", fr: "perforeuse", py: "账赫否赫姿", cat: "工程机械" },
+      { cn: "沥青摊铺机", fr: "répandeuse de bitume", py: "黑帮德姿", cat: "工程机械" },
+      { cn: "石屑撒布机", fr: "gravillonneuse", py: "格哈维永呢姿", cat: "工程机械" },
+      { cn: "0.5T 自卸车", fr: "dumpeur", py: "当博和", cat: "工程机械" },
+      { cn: "5T 自卸车", fr: "benne de 5T", py: "败呢得三科到呢", cat: "工程机械" },
+      { cn: "15T 自卸车", fr: "benne de 15T", py: "败呢得干子到呢", cat: "工程机械" },
+      { cn: "15T 平板车", fr: "camion de 15T", py: "嘎米水得干子到呢", cat: "工程机械" },
+      { cn: "跳夯", fr: "dame sauteuse", py: "大漠所得子", cat: "工程机械" },
+
+      // 生活工作
+      { cn: "上班了", fr: "aller au travail", py: "阿雷哦特哈瓦也", cat: "生活工作" },
+      { cn: "下班", fr: "terminer", py: "黛赫米内", cat: "生活工作" },
+      { cn: "今天就到这里", fr: "C'est tout pour aujourd'hui", py: "塞度扑赫哦如何最", cat: "生活工作" },
+      { cn: "休息", fr: "repos", py: "河泊", cat: "生活工作" },
+      { cn: "睡觉", fr: "dormir", py: "刀赫米赫", cat: "生活工作" },
+      { cn: "吃饭", fr: "manger", py: "芒热", cat: "生活工作" },
+      { cn: "放假", fr: "vacances", py: "瓦岗斯", cat: "生活工作" },
+      { cn: "打考勤", fr: "pointage", py: "布玩打热", cat: "生活工作" },
+      { cn: "快点", fr: "vite / rapide", py: "维特 / 哈比德", cat: "生活工作" },
+      { cn: "慢点", fr: "lentement", py: "茹特芒", cat: "生活工作" },
+      { cn: "停车", fr: "arrêter", py: "阿黑得", cat: "生活工作" },
+      { cn: "检查", fr: "vérifier", py: "维黑费也", cat: "生活工作" },
+      { cn: "检查车辆油水", fr: "vérifier les huiles et l'eau", py: "维黑费也得雨乐诶哦", cat: "生活工作" },
+      { cn: "加油", fr: "ajouter de l'huile / ravitailler", py: "阿入带德雨乐 / 哈维搭也", cat: "生活工作" },
+      { cn: "加水", fr: "ajouter de l'eau", py: "阿入带德哦", cat: "生活工作" },
+      { cn: "工资", fr: "salaire", py: "萨米赫", cat: "生活工作" },
+      { cn: "发工资", fr: "payer le salaire", py: "背也勒萨来赫", cat: "生活工作" },
+      { cn: "工具", fr: "outil", py: "乌迪也", cat: "生活工作" },
+      { cn: "带上工具", fr: "prendre des outillages", py: "坡航德赫得乌迪亚惹", cat: "生活工作" },
+      { cn: "把车辆停整齐", fr: "arranger les véhicules", py: "阿航惹得维一规乐", cat: "生活工作" },
+      { cn: "看守设备", fr: "garder le matériel", py: "嘎赫德得马德黑也乐", cat: "生活工作" },
+      { cn: "请假", fr: "permission", py: "白鹤米送", cat: "生活工作" },
+      { cn: "生病", fr: "malade", py: "马拉德", cat: "生活工作" },
+      { cn: "缺勤", fr: "absent", py: "阿布桑", cat: "生活工作" },
+      { cn: "安全", fr: "sécurité", py: "赛规黑带", cat: "生活工作" },
+      { cn: "注意 / 小心", fr: "attention", py: "阿当思用", cat: "生活工作" },
+      { cn: "工时", fr: "heure de service", py: "俄赫得赛赫维斯", cat: "生活工作" },
+
+      // 职业
+      { cn: "电工", fr: "électricien", py: "诶来客特黑四眼", cat: "职业" },
+      { cn: "木工", fr: "menuisier", py: "莫女斯也", cat: "职业" },
+      { cn: "泥水工", fr: "maçon", py: "马松", cat: "职业" },
+      { cn: "操作工", fr: "conducteur", py: "共第科德赫", cat: "职业" },
+      { cn: "电焊工", fr: "soudeur", py: "苏德赫", cat: "职业" },
+      { cn: "工人", fr: "ouvrier / travailleur", py: "乌乌黑也 / 特哈瓦也赫", cat: "职业" },
+      { cn: "警察", fr: "police / policier", py: "波利斯 / 波利斯也", cat: "职业" },
+      { cn: "军人", fr: "soldat / militaire", py: "缩乐搭 / 米粒带赫", cat: "职业" },
+      { cn: "农民", fr: "paysan", py: "贝依藏", cat: "职业" },
+      { cn: "老板", fr: "patron", py: "罢桶", cat: "职业" },
+
+      // 工具
+      { cn: "螺栓", fr: "boulon", py: "布隆", cat: "工具" },
+      { cn: "螺母", fr: "écrou", py: "诶客户", cat: "工具" },
+      { cn: "锤", fr: "marteau", py: "马赫多", cat: "工具" },
+      { cn: "铲 / 铁锹", fr: "pelle", py: "败了", cat: "工具" },
+      { cn: "镐", fr: "pioche", py: "皮哦食", cat: "工具" },
+      { cn: "活动扳手", fr: "clé à molette", py: "科雷阿莫洛特", cat: "工具" },
+      { cn: "开口扳手", fr: "clé plate", py: "科雷费拉特", cat: "工具" },
+      { cn: "梅花扳手", fr: "clé à lunette", py: "科雷绿奈特", cat: "工具" },
+      { cn: "起子", fr: "tournevis", py: "度赫呢维斯", cat: "工具" },
+      { cn: "十字起子", fr: "tournevis cruciforme", py: "度赫呢维斯科和瓦", cat: "工具" },
+      { cn: "皮带扳手", fr: "clé à filtre", py: "克雷阿费乐特赫", cat: "工具" },
+      { cn: "六角扳手", fr: "clé Allen", py: "克雷阿来呢", cat: "工具" },
+      { cn: "老虎钳", fr: "pince", py: "扳斯", cat: "工具" },
+      { cn: "管钳", fr: "pince à tubes", py: "扳斯阿杜布", cat: "工具" },
+      { cn: "万用钳", fr: "pince universelle", py: "扳斯雨泥维和墨乐", cat: "工具" },
+      { cn: "焊钳", fr: "pince à souder", py: "败斯阿苏得埃", cat: "工具" },
+      { cn: "电焊面具", fr: "masque", py: "马斯刻", cat: "工具" },
+      { cn: "焊条", fr: "électrode", py: "埃来科拖得", cat: "工具" },
+      { cn: "焊把线", fr: "câble à souder", py: "嘎布乐阿苏得埃", cat: "工具" },
+      { cn: "电焊机", fr: "poste à souder", py: "博斯特阿苏得埃", cat: "工具" },
+      { cn: "手推车 / 独轮车", fr: "brouette", py: "布胡外特", cat: "工具" },
+      { cn: "打火机", fr: "briquet", py: "布嘿该", cat: "工具" },
+
+      // 车辆部件
+      { cn: "车轮", fr: "roue", py: "护", cat: "车辆部件" },
+      { cn: "轮胎", fr: "pneu", py: "扑呢", cat: "车辆部件" },
+      { cn: "发动机", fr: "moteur", py: "莫德赫", cat: "车辆部件" },
+      { cn: "发电机", fr: "groupe électrogène", py: "哥护扑埃赖科拖惹呢", cat: "车辆部件" },
+      { cn: "机滤", fr: "filtre à huile", py: "费乐特赫阿雨乐", cat: "车辆部件" },
+      { cn: "柴油滤", fr: "filtre à gasoil", py: "费乐特赫阿嘎兹哇乐", cat: "车辆部件" },
+      { cn: "电瓶", fr: "batterie", py: "巴特黑", cat: "车辆部件" },
+      { cn: "充电", fr: "chargeur", py: "沙赫惹赫", cat: "车辆部件" },
+      { cn: "离合器", fr: "embrayage", py: "昂布黑亚惹", cat: "车辆部件" },
+      { cn: "刹车", fr: "frein", py: "佛汗", cat: "车辆部件" },
+      { cn: "油门", fr: "accélérateur", py: "阿克瑟雷哈德赫", cat: "车辆部件" },
+      { cn: "车门", fr: "porte", py: "饱和特", cat: "车辆部件" },
+      { cn: "车速", fr: "vitesse", py: "维戴斯", cat: "车辆部件" },
+      { cn: "灯", fr: "lampe", py: "郎扑", cat: "车辆部件" },
+      { cn: "仪表盘", fr: "tableau de bord", py: "搭布落德泊河", cat: "车辆部件" },
+      { cn: "油量表", fr: "indicateur de gasoil", py: "按第卡德赫得嘎姿瓦乐", cat: "车辆部件" },
+      { cn: "温度表", fr: "indicateur de température", py: "按第卡德赫得当背哈度赫", cat: "车辆部件" },
+      { cn: "手刹", fr: "frein à main", py: "佛汗阿慢", cat: "车辆部件" },
+      { cn: "水泵", fr: "pompe à eau", py: "蹦扑阿哦", cat: "车辆部件" },
+      { cn: "油泵", fr: "pompe à huile", py: "蹦扑阿育乐", cat: "车辆部件" },
+      { cn: "开关", fr: "interrupteur", py: "按德回扑得赫", cat: "车辆部件" },
+      { cn: "漏气", fr: "fuite d'air", py: "费育特戴赫", cat: "车辆部件" },
+      { cn: "漏油", fr: "fuite d'huile", py: "费育特得育乐", cat: "车辆部件" },
+
+      // 材料
+      { cn: "沙", fr: "sable", py: "萨博了", cat: "材料" },
+      { cn: "土", fr: "sol", py: "缩了", cat: "材料" },
+      { cn: "水泥", fr: "ciment", py: "西芒", cat: "材料" },
+      { cn: "沥青", fr: "bitume", py: "比度么", cat: "材料" },
+      { cn: "煤油", fr: "pétrole", py: "背特豁了", cat: "材料" },
+      { cn: "汽油", fr: "essence", py: "唉桑丝", cat: "材料" },
+      { cn: "柴油", fr: "gasoil", py: "嘎姿瓦乐", cat: "材料" },
+      { cn: "钢筋", fr: "barre de fer", py: "把赫得费赫", cat: "材料" },
+      { cn: "钢管", fr: "tuyau d'acier", py: "丢凹搭丝也", cat: "材料" },
+      { cn: "炸药", fr: "explosif", py: "爱刻丝坡落贼扶", cat: "材料" },
+      { cn: "火雷管", fr: "détonateur", py: "带刀那得赫", cat: "材料" },
+      { cn: "导火索", fr: "mèche lente", py: "迈师郎特", cat: "材料" },
+      { cn: "水", fr: "eau", py: "哦", cat: "材料" },
+      { cn: "电", fr: "électricité", py: "诶来客特黑西带", cat: "材料" },
+      { cn: "机油", fr: "huile moteur", py: "育了莫德赫", cat: "材料" },
+      { cn: "黄油", fr: "graisse", py: "格亥斯", cat: "材料" },
+      { cn: "液压油", fr: "huile hydraulique", py: "育了意德货里刻", cat: "材料" },
+      { cn: "齿轮油", fr: "huile de boîte", py: "育了德部瓦特", cat: "材料" },
+      { cn: "砖", fr: "brique", py: "布嘿刻", cat: "材料" },
+      { cn: "钢板", fr: "tôle d'acier", py: "跺了打斯也", cat: "材料" },
+      { cn: "木板", fr: "planche", py: "破郎施", cat: "材料" },
+      { cn: "波形瓦 / 铁皮", fr: "tôle", py: "跺了", cat: "材料" },
+      { cn: "玻璃", fr: "glace / verre", py: "格拉斯", cat: "材料" },
+      { cn: "钢", fr: "acier", py: "阿斯也", cat: "材料" },
+      { cn: "铁", fr: "fer", py: "非赫", cat: "材料" },
+      { cn: "竹子", fr: "bambou", py: "绑布", cat: "材料" },
+
+      // 动作
+      { cn: "干净", fr: "propre", py: "破号破和", cat: "动作" },
+      { cn: "脏", fr: "sale", py: "撒乐", cat: "动作" },
+      { cn: "修复", fr: "réparer", py: "黑把黑", cat: "动作" },
+      { cn: "补坑", fr: "réparer nids de poule", py: "黑把黑泥得布了", cat: "动作" },
+      { cn: "预制", fr: "préfabriquer", py: "坡黑法伯黑给", cat: "动作" },
+      { cn: "现浇", fr: "couler", py: "古类", cat: "动作" },
+      { cn: "铺砌", fr: "poser", py: "泊破", cat: "动作" },
+      { cn: "拌和", fr: "mélanger", py: "美郎惹", cat: "动作" },
+      { cn: "运输", fr: "transporter", py: "特航斯泊赫得", cat: "动作" },
+      { cn: "摊铺", fr: "répandre", py: "黑帮得赫", cat: "动作" },
+      { cn: "碾压", fr: "compacter", py: "共把得赫", cat: "动作" },
+      { cn: "清扫", fr: "balayer", py: "把来也", cat: "动作" },
+      { cn: "清除", fr: "nettoyer", py: "内拖瓦也", cat: "动作" },
+      { cn: "验收", fr: "réception", py: "黑塞坡斯用", cat: "动作" },
+      { cn: "计量", fr: "mesurer", py: "抹最黑", cat: "动作" },
+      { cn: "爆破 / 拆除", fr: "démolir", py: "带毛利赫", cat: "动作" },
+      { cn: "推", fr: "pousser", py: "布斯", cat: "动作" },
+      { cn: "拉", fr: "tirer", py: "第黑", cat: "动作" },
+      { cn: "砍", fr: "couper", py: "沾被", cat: "动作" },
+      { cn: "弄断", fr: "casser", py: "嘎赛", cat: "动作" },
+      { cn: "挖", fr: "creuser / excaver", py: "可赫塞 / 诶可斯嘎为", cat: "动作" },
+      { cn: "回填", fr: "remblai", py: "行布赖", cat: "动作" },
+      { cn: "进", fr: "avancer", py: "阿旺瑟", cat: "动作" },
+      { cn: "退", fr: "reculer", py: "赫古雷", cat: "动作" },
+      { cn: "合起来", fr: "combiner", py: "共笔内", cat: "动作" },
+      { cn: "分开", fr: "séparer", py: "赛八黑", cat: "动作" },
+      { cn: "抓 / 拿", fr: "prendre", py: "破航德赫", cat: "动作" },
+      { cn: "做 / 干", fr: "faire", py: "菲赫", cat: "动作" },
+      { cn: "开", fr: "ouvrir", py: "乌乌黑赫", cat: "动作" },
+      { cn: "关", fr: "fermer", py: "非赫美", cat: "动作" },
+      { cn: "修理", fr: "réparer", py: "黑罢黑", cat: "动作" },
+      { cn: "用", fr: "utiliser", py: "雨滴沥贼", cat: "动作" },
+      { cn: "浇砼", fr: "couler le béton", py: "咕累乐贝冻", cat: "动作" },
+      { cn: "立模", fr: "dresser la planche", py: "的害塞拉普朗施", cat: "动作" },
+      { cn: "绑钢筋", fr: "lier de l'acier", py: "裂的拉塞耶", cat: "动作" },
+      { cn: "砌砖", fr: "bâtir la brique", py: "巴第喝拉不黑客", cat: "动作" },
+      { cn: "上车", fr: "montez", py: "蒙得", cat: "动作" },
+      { cn: "下车", fr: "descendez", py: "得桑得", cat: "动作" },
+
+      // 方向位置
+      { cn: "内", fr: "intérieur", py: "安得赫依鹅赫", cat: "方向位置" },
+      { cn: "外", fr: "extérieur", py: "爱克斯得赫依鹅赫", cat: "方向位置" },
+      { cn: "上", fr: "haut", py: "哦", cat: "方向位置" },
+      { cn: "下", fr: "bas", py: "罢", cat: "方向位置" },
+      { cn: "左", fr: "gauche", py: "个施", cat: "方向位置" },
+      { cn: "右", fr: "droit", py: "得胡瓦", cat: "方向位置" },
+      { cn: "旁边", fr: "à côté de", py: "阿个得德", cat: "方向位置" },
+      { cn: "这里", fr: "ici", py: "依西", cat: "方向位置" },
+      { cn: "那里", fr: "là-bas", py: "拉罢", cat: "方向位置" },
+
+      // 日常交际
+      { cn: "这是什么？", fr: "C'est quoi ?", py: "瑟挂", cat: "日常交际" },
+      { cn: "怎样？", fr: "comment ?", py: "共芒", cat: "日常交际" },
+      { cn: "我要……", fr: "Je veux…", py: "热沃", cat: "日常交际" },
+      { cn: "我不要……", fr: "Je ne veux pas…", py: "热沃罢", cat: "日常交际" },
+      { cn: "同意", fr: "d'accord", py: "搭个赫", cat: "日常交际" },
+      { cn: "允许", fr: "permettre", py: "贝赫迈得", cat: "日常交际" },
+      { cn: "给我", fr: "donne-moi", py: "多呢亩瓦", cat: "日常交际" },
+      { cn: "有没有？", fr: "Il y a… ou pas ?", py: "依里亚……乌把", cat: "日常交际" },
+      { cn: "卖", fr: "vendre", py: "网德赫", cat: "日常交际" },
+      { cn: "买", fr: "acheter", py: "阿施得", cat: "日常交际" },
+      { cn: "太贵了", fr: "trop cher", py: "特哦杜赫", cat: "日常交际" },
+      { cn: "少点", fr: "moins", py: "亩昂", cat: "日常交际" },
+      { cn: "以后", fr: "après", py: "阿婆唉", cat: "日常交际" },
+      { cn: "以前", fr: "avant", py: "阿旺", cat: "日常交际" },
+      { cn: "肯定", fr: "sûr", py: "续赫", cat: "日常交际" },
+      { cn: "帮助", fr: "aider", py: "爱得", cat: "日常交际" },
+      { cn: "好 / 很好", fr: "bien / très bien", py: "变 / 特海变", cat: "日常交际" },
+      { cn: "不好", fr: "pas bien", py: "罢变", cat: "日常交际" },
+      { cn: "你好（白天）", fr: "bonjour", py: "泵如赫", cat: "日常交际" },
+      { cn: "你好（晚上）", fr: "bonsoir", py: "泵斯瓦赫", cat: "日常交际" },
+      { cn: "帮我做……", fr: "aide-moi à faire…", py: "爱德姆瓦非赫", cat: "日常交际" },
+      { cn: "多少？", fr: "Combien ?", py: "共便", cat: "日常交际" },
+      { cn: "多 / 太多", fr: "beaucoup / trop", py: "波油 / 特霍", cat: "日常交际" },
+      { cn: "少", fr: "peu", py: "伯", cat: "日常交际" },
+
+      // 食物
+      { cn: "男", fr: "homme", py: "哦姆", cat: "食物人物" },
+      { cn: "女", fr: "femme / madame", py: "发姆 / 马达姆", cat: "食物人物" },
+      { cn: "蔬菜", fr: "légumes", py: "维惹达乐", cat: "食物人物" },
+      { cn: "肉", fr: "viande", py: "伍样德", cat: "食物人物" },
+      { cn: "洗涮", fr: "laver", py: "拉维", cat: "食物人物" },
+      { cn: "洗碗", fr: "laver les bols", py: "拉维得波乐", cat: "食物人物" },
+      { cn: "扫地", fr: "nettoyer le sol", py: "内德哇业拉德赫", cat: "食物人物" },
+      { cn: "开水", fr: "eau bouillante", py: "哦布杨", cat: "食物人物" },
+      { cn: "大葱", fr: "poireau", py: "布瓦霍", cat: "食物人物" },
+      { cn: "小葱", fr: "ciboule", py: "西布勒", cat: "食物人物" },
+      { cn: "姜", fr: "gingembre", py: "让让布赫", cat: "食物人物" },
+      { cn: "蒜", fr: "ail", py: "阿二", cat: "食物人物" },
+      { cn: "辣椒", fr: "piment", py: "逼忙", cat: "食物人物" },
+      { cn: "盐", fr: "sel", py: "塞乐", cat: "食物人物" },
+      { cn: "胡椒", fr: "poivre", py: "布哇伍赫", cat: "食物人物" },
+      { cn: "酱油", fr: "sauce de soja", py: "缩司德缩热啊", cat: "食物人物" },
+      { cn: "醋", fr: "vinaigre", py: "维内阁赫", cat: "食物人物" },
+      { cn: "鸡蛋", fr: "œuf", py: "俄刷", cat: "食物人物" },
+      { cn: "牛肉", fr: "bœuf", py: "薄刷", cat: "食物人物" },
+      { cn: "鸡肉", fr: "poulet", py: "布勒", cat: "食物人物" },
+      { cn: "午饭", fr: "déjeuner", py: "得热内", cat: "食物人物" },
+      { cn: "晚饭", fr: "dîner", py: "滴内", cat: "食物人物" },
+      { cn: "面条", fr: "nouilles", py: "努依", cat: "食物人物" },
+      { cn: "意大利面条", fr: "spaghetti", py: "撕怕给第", cat: "食物人物" },
+
+      // 服装
+      { cn: "手套", fr: "gant", py: "杠", cat: "服装" },
+      { cn: "衣服", fr: "vêtement", py: "外特芒", cat: "服装" },
+      { cn: "鞋子", fr: "chaussure", py: "说苏赫", cat: "服装" },
+      { cn: "拖鞋", fr: "babouche / pantoufle", py: "八布食 / 帮杜夫勒", cat: "服装" },
+      { cn: "帽子", fr: "chapeau", py: "沙波", cat: "服装" },
     ];
 
-    // 纠正拼接错误分类
-    DEFAULT_TERMS[81].cat = "五、应急与状态";
+    // ========== 状态 ==========
+    let mode = "card";
+    let cardIndex = 0;
+    let showAnswer = false;
+    let shuffled = [...VOCAB];
+    let quizIndex = 0;
+    let quizScore = 0;
+    let quizTotal = 0;
+    let quizOptions = [];
+    let quizAnswered = false;
+    let currentFilter = "全部";
+    let searchQuery = "";
+    let learned = new Set(JSON.parse(localStorage.getItem("jianghu_learned") || "[]"));
 
-    // ==================== 全局变量 ====================
-    let terms = [];
-    let currentLang = 'zh';
-    let currentTheme = 0; // 0: 亮色, 1: 暗黑, 2: 夜视
-    let examQuestions = [];
-    let currentExamIndex = 0;
-    let examScore = 0;
-
-    // 多语言包
-    const I18N = {
-      zh: {
-        startExam: "开始考试",
-        systemSettings: "系统设置",
-        themeMode: "主题模式",
-        interfaceLang: "界面语言",
-        allCategory: "全部分类",
-        addBtn: "新增",
-        exportBtn: "导出",
-        importBtn: "导入",
-        thNo: "序号",
-        thCn: "中文意义",
-        thSw: "斯瓦希里语",
-        thPy: "推荐音译",
-        thAction: "操作",
-        noData: "未找到匹配的战术术语",
-        examTitle: "安全官指挥术语考核",
-        exitBtn: "退出",
-        submitBtn: "提交答案",
-        confirmDelete: "确定要永久删除这条指挥术语吗？",
-        toastSave: "✅ 术语保存成功",
-        toastDelete: "🗑️ 术语已成功删除",
-        toastImport: "✅ 成功导入新战术术语！",
-        toastRestore: "🔄 系统术语数据库已重置为默认值",
-        toastSelectLang: "🌐 界面语言已切换为中文",
-        searchPlaceholder: "🔍 搜索 中文 / 推荐音译 / 斯瓦希里语...",
-        restoreDefault: "重置术语库",
-        cloudSync: "数据备份 (CSV)",
-        examEnterAns: "输入推荐音译...",
-        examIncorrect: "❌ 答错了！正确答案是：",
-        examCorrect: "🎉 回答正确！",
-        examSuccess: "恭喜您完成了安全官术语考核！",
-        reExam: "再次考核"
-      },
-      en: {
-        startExam: "Start Exam",
-        systemSettings: "Settings",
-        themeMode: "Theme Mode",
-        interfaceLang: "Language",
-        allCategory: "All Categories",
-        addBtn: "Add New",
-        exportBtn: "Export",
-        importBtn: "Import",
-        thNo: "No.",
-        thCn: "Chinese Meaning",
-        thSw: "Swahili",
-        thPy: "Pronunciation (Py)",
-        thAction: "Action",
-        noData: "No matching tactical terms found",
-        examTitle: "Security Terminology Test",
-        exitBtn: "Exit",
-        submitBtn: "Submit",
-        confirmDelete: "Are you sure you want to permanently delete this command term?",
-        toastSave: "✅ Term saved successfully",
-        toastDelete: "🗑️ Term deleted successfully",
-        toastImport: "✅ Imported tactical terms successfully!",
-        toastRestore: "🔄 Tactical database reset to defaults",
-        toastSelectLang: "🌐 Language switched to English",
-        searchPlaceholder: "🔍 Search Chinese / Pronunciation / Swahili...",
-        restoreDefault: "Reset Terms Data",
-        cloudSync: "Backup (CSV)",
-        examEnterAns: "Enter the spelling...",
-        examIncorrect: "❌ Incorrect! Correct answer:",
-        examCorrect: "🎉 Correct!",
-        examSuccess: "Congratulations! You have completed the test.",
-        reExam: "Retake Test"
-      }
-    };
-
-    // ==================== 提示系统 ====================
-    function showToast(message, type = "success") {
-      const container = document.getElementById('toastContainer');
-      const toast = document.createElement('div');
-      toast.className = `p-3 rounded-xl shadow-xl flex items-center gap-1.5 border bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-xs font-semibold transform translate-y-2 opacity-0 transition-all duration-300 pointer-events-auto`;
-      
-      let icon = '<i class="fas fa-check-circle text-green-500"></i>';
-      if (type === 'error') {
-        icon = '<i class="fas fa-exclamation-circle text-red-500"></i>';
-        toast.classList.add('border-red-100', 'dark:border-red-950');
-      } else if (type === 'info') {
-        icon = '<i class="fas fa-info-circle text-blue-500"></i>';
-      }
-      
-      toast.innerHTML = `${icon} <span>${message}</span>`;
-      container.appendChild(toast);
-      
-      // Animate entry
-      setTimeout(() => {
-        toast.classList.remove('translate-y-2', 'opacity-0');
-      }, 10);
-      
-      // Remove toast
-      setTimeout(() => {
-        toast.classList.add('opacity-0', 'translate-y-[-10px]');
-        setTimeout(() => {
-          toast.remove();
-        }, 300);
-      }, 3000);
+    // ========== 工具函数 ==========
+    function speak(text) {
+      if (!window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "fr-FR";
+      u.rate = 0.85;
+      u.pitch = 1;
+      window.speechSynthesis.speak(u);
     }
 
-    // 自定义确认弹窗
-    function showConfirm(title, message, onOk) {
-      const modal = document.getElementById('confirmModal');
-      document.getElementById('confirmTitle').textContent = title;
-      document.getElementById('confirmMessage').textContent = message;
-      modal.classList.remove('hidden');
-
-      const cleanUp = () => {
-        modal.classList.add('hidden');
-        document.getElementById('confirmOkBtn').removeEventListener('click', handleOk);
-        document.getElementById('confirmCancelBtn').removeEventListener('click', handleCancel);
-      };
-
-      const handleOk = () => { onOk(); cleanUp(); };
-      const handleCancel = () => { cleanUp(); };
-
-      document.getElementById('confirmOkBtn').addEventListener('click', handleOk);
-      document.getElementById('confirmCancelBtn').addEventListener('click', handleCancel);
+    function saveLearned() {
+      localStorage.setItem("jianghu_learned", JSON.stringify([...learned]));
+      updateStats();
     }
 
-    // ==================== 渲染引擎 (极窄间距自适应，拒绝滑动) ====================
-    function renderTable(data) {
-      const tbody = document.getElementById('tableBody');
-      const noDataView = document.getElementById('noDataView');
-      tbody.innerHTML = '';
+    function updateStats() {
+      document.getElementById("stat-total").textContent = VOCAB.length;
+      document.getElementById("stat-learned").textContent = learned.size;
+      document.getElementById("stat-score").textContent = quizScore;
+    }
 
-      if (data.length === 0) {
-        noDataView.classList.remove('hidden');
-        return;
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
       }
-      noDataView.classList.add('hidden');
-
-      // 统一按照 num 升序（1 - 100）排列
-      const sorted = [...data].sort((a, b) => a.num - b.num);
-
-      let currentCategory = '';
-      const searchValue = document.getElementById('searchInput').value.trim().toLowerCase();
-
-      sorted.forEach(item => {
-        // 分类标头 (小单元格 padding)
-        if (item.cat !== currentCategory) {
-          const header = document.createElement('tr');
-          header.className = 'category-header border-y dark:border-zinc-800 transition-all duration-200';
-          header.innerHTML = `<td colspan="5" class="px-2 py-2 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider">${item.cat}</td>`;
-          tbody.appendChild(header);
-          currentCategory = item.cat;
-        }
-
-        // 高亮检索词
-        let highlightedCn = highlightText(item.cn, searchValue);
-        let highlightedSw = highlightText(item.sw, searchValue);
-        let highlightedPy = highlightText(item.py, searchValue);
-
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-green-50/40 dark:hover:bg-zinc-800/40 border-b border-zinc-100 dark:border-zinc-800/40 transition-colors duration-150';
-        tr.innerHTML = `
-          <td class="px-1.5 py-2 text-center font-mono font-bold text-zinc-400 dark:text-zinc-600 text-[10px] sm:text-xs">${item.num}</td>
-          <td class="px-1.5 py-2 font-medium break-all text-[11px] sm:text-xs">${highlightedCn}</td>
-          <td class="px-1.5 py-2 font-sans break-all text-[11px] sm:text-xs">${highlightedSw}</td>
-          <td class="px-1.5 py-2 font-semibold text-green-700 dark:text-green-400 break-all text-[11px] sm:text-xs">${highlightedPy}</td>
-          <td class="px-1.5 py-2 text-center">
-            <div class="flex items-center justify-center gap-0.5">
-              <button onclick="editTerm(${item.id})" class="p-1 text-indigo-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-zinc-800 rounded transition-all" title="修改">
-                <i class="fas fa-edit text-[10px] sm:text-xs"></i>
-              </button>
-              <button onclick="deleteTerm(${item.id})" class="p-1 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-zinc-800 rounded transition-all" title="删除">
-                <i class="fas fa-trash-can text-[10px] sm:text-xs"></i>
-              </button>
-            </div>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
+      return a;
     }
 
-    // 搜索高亮辅助函数
-    function highlightText(text, search) {
-      if (!search) return text;
-      const strText = String(text);
-      const index = strText.toLowerCase().indexOf(search);
-      if (index >= 0) {
-        return strText.substring(0, index) + 
-               `<mark class="bg-yellow-200 dark:bg-yellow-900/60 dark:text-yellow-100 rounded-sm px-0.5">${strText.substring(index, index + search.length)}</mark>` + 
-               strText.substring(index + search.length);
+    function getCategories() {
+      const cats = new Set(VOCAB.map(v => v.cat));
+      return ["全部", ...cats];
+    }
+
+    function getFiltered() {
+      let list = VOCAB;
+      if (currentFilter !== "全部") {
+        list = list.filter(v => v.cat === currentFilter);
       }
-      return text;
-    }
-
-    // 分类和搜索混合过滤
-    function filterTable() {
-      const search = document.getElementById('searchInput').value.toLowerCase();
-      const category = document.getElementById('categoryFilter').value;
-      let filtered = terms;
-      if (category) filtered = filtered.filter(t => t.cat === category);
-      if (search) {
-        filtered = filtered.filter(t =>
-          String(t.cn).toLowerCase().includes(search) ||
-          String(t.sw).toLowerCase().includes(search) ||
-          String(t.py).toLowerCase().includes(search)
+      if (searchQuery.trim()) {
+        const q = searchQuery.trim().toLowerCase();
+        list = list.filter(v =>
+          v.cn.includes(q) ||
+          v.fr.toLowerCase().includes(q) ||
+          v.py.includes(q)
         );
       }
-      renderTable(filtered);
+      return list;
     }
 
-    // ==================== 术语库 CRUD 管理 ====================
-    function showAddModal() {
-      document.getElementById('modalTitle').textContent = currentLang === 'zh' ? '新增术语' : 'Add Term';
-      document.getElementById('editId').value = '';
-      document.getElementById('catInput').value = '一、指挥与身份';
-      document.getElementById('numInput').value = terms.length > 0 ? Math.max(...terms.map(t => t.num)) + 1 : 1;
-      document.getElementById('cnInput').value = '';
-      document.getElementById('swInput').value = '';
-      document.getElementById('pyInput').value = '';
-      document.getElementById('modal').classList.remove('hidden');
+    // ========== 渲染 ==========
+    function render() {
+      const main = document.getElementById("main");
+      if (mode === "card") renderCard(main);
+      else if (mode === "quiz") renderQuiz(main);
+      else if (mode === "list") renderList(main);
+      else if (mode === "about") renderAbout(main);
+      updateStats();
     }
 
-    function editTerm(id) {
-      const term = terms.find(t => t.id === id);
-      if (!term) return;
-      document.getElementById('modalTitle').textContent = currentLang === 'zh' ? '编辑术语' : 'Edit Term';
-      document.getElementById('editId').value = term.id;
-      document.getElementById('catInput').value = term.cat;
-      document.getElementById('numInput').value = term.num;
-      document.getElementById('cnInput').value = term.cn;
-      document.getElementById('swInput').value = term.sw;
-      document.getElementById('pyInput').value = term.py;
-      document.getElementById('modal').classList.remove('hidden');
+    function renderCard(main) {
+      if (cardIndex >= shuffled.length) cardIndex = 0;
+      const item = shuffled[cardIndex];
+      const progress = ((cardIndex + 1) / shuffled.length * 100).toFixed(0);
+
+      main.innerHTML = `
+        <div class="progress-bar"><div class="fill" style="width:${progress}%"></div></div>
+        <div style="text-align:center;font-size:0.85rem;color:var(--text-muted);margin-bottom:8px;">
+          ${cardIndex + 1} / ${shuffled.length}
+        </div>
+        <div class="flash-card">
+          <div class="category">${item.cat}</div>
+          <div class="cn">${item.cn}</div>
+          ${showAnswer ? `
+            <div class="fr">${item.fr}</div>
+            <div class="py">${item.py}</div>
+          ` : `
+            <div class="hint">点击下方按钮查看法语与读音</div>
+          `}
+        </div>
+        <div class="btn-row">
+          ${showAnswer ? `
+            <button class="btn btn-accent" onclick="speak('${item.fr.replace(/'/g, "\\'")}')">🔊 发音</button>
+            <button class="btn btn-success" onclick="markLearned()">✓ 已掌握</button>
+            <button class="btn btn-ghost" onclick="nextCard()">下一个 →</button>
+          ` : `
+            <button class="btn btn-primary" onclick="reveal()">显示答案</button>
+            <button class="btn btn-ghost" onclick="nextCard()">跳过</button>
+          `}
+        </div>
+        <div class="btn-row" style="margin-top:10px;">
+          <button class="btn btn-ghost" onclick="prevCard()">← 上一个</button>
+          <button class="btn btn-ghost" onclick="reshuffle()">🔀 重新打乱</button>
+        </div>
+      `;
     }
 
-    function saveTerm() {
-      const id = document.getElementById('editId').value;
-      const newTerm = {
-        id: id ? parseInt(id) : Date.now(),
-        cat: document.getElementById('catInput').value,
-        num: parseInt(document.getElementById('numInput').value) || 0,
-        cn: document.getElementById('cnInput').value.trim(),
-        sw: document.getElementById('swInput').value.trim(),
-        py: document.getElementById('pyInput').value.trim()
-      };
+    function reveal() {
+      showAnswer = true;
+      render();
+    }
 
-      if (!newTerm.cn || !newTerm.sw || !newTerm.py) {
-        showToast(currentLang === 'zh' ? '❌ 所有信息均必填！' : 'All fields required', 'error');
+    function nextCard() {
+      showAnswer = false;
+      cardIndex = (cardIndex + 1) % shuffled.length;
+      render();
+    }
+
+    function prevCard() {
+      showAnswer = false;
+      cardIndex = (cardIndex - 1 + shuffled.length) % shuffled.length;
+      render();
+    }
+
+    function reshuffle() {
+      shuffled = shuffle(VOCAB);
+      cardIndex = 0;
+      showAnswer = false;
+      render();
+    }
+
+    function markLearned() {
+      const item = shuffled[cardIndex];
+      learned.add(item.cn + "|" + item.fr);
+      saveLearned();
+      nextCard();
+    }
+
+    // ========== 测验 ==========
+    window._currentQuizItem = null;
+
+    function startQuiz() {
+      quizIndex = 0;
+      quizScore = 0;
+      quizTotal = 20;
+      quizAnswered = false;
+      nextQuizQuestion();
+    }
+
+    function nextQuizQuestion() {
+      if (quizIndex >= 20) {
+        renderQuizResult();
+        return;
+      }
+      // 随机抽一个还没考过的（简单起见直接随机）
+      const correct = VOCAB[Math.floor(Math.random() * VOCAB.length)];
+      window._currentQuizItem = correct;
+      const wrongs = shuffle(VOCAB.filter(v => v.fr !== correct.fr)).slice(0, 3);
+      quizOptions = shuffle([correct, ...wrongs]);
+      quizAnswered = false;
+      render();
+    }
+
+    function renderQuiz(main) {
+      if (quizTotal === 0) {
+        main.innerHTML = `
+          <div class="empty">
+            <p style="font-size:1.2rem;margin-bottom:16px;">准备好测试你的法语了吗？</p>
+            <button class="btn btn-primary" onclick="startQuiz()">开始测验（20题）</button>
+          </div>
+        `;
         return;
       }
 
-      if (id) {
-        const index = terms.findIndex(t => t.id === parseInt(id));
-        if (index > -1) terms[index] = newTerm;
-      } else {
-        terms.push(newTerm);
+      if (quizIndex >= 20) {
+        renderQuizResult();
+        return;
       }
 
-      saveToLocal();
-      closeModal();
-      filterTable();
-      showToast(I18N[currentLang].toastSave, 'success');
-    }
-
-    function deleteTerm(id) {
-      showConfirm(
-        currentLang === 'zh' ? '删除确认' : 'Delete Confirm',
-        I18N[currentLang].confirmDelete,
-        () => {
-          terms = terms.filter(t => t.id !== id);
-          saveToLocal();
-          filterTable();
-          showToast(I18N[currentLang].toastDelete, 'info');
-        }
-      );
-    }
-
-    function closeModal() {
-      document.getElementById('modal').classList.add('hidden');
-    }
-
-    // ==================== CSV 数据备份及导入 ====================
-    function saveToLocal() {
-      localStorage.setItem('security_terms_v3', JSON.stringify(terms));
-    }
-
-    function loadFromLocal() {
-      const saved = localStorage.getItem('security_terms_v3');
-      if (saved) {
-        terms = JSON.parse(saved);
-      } else {
-        terms = [...DEFAULT_TERMS];
+      const item = window._currentQuizItem;
+      if (!item) {
+        nextQuizQuestion();
+        return;
       }
-      renderTable(terms);
+
+      main.innerHTML = `
+        <div class="score-banner">
+          第 \( {quizIndex + 1} / 20 题 · 当前得分 <span style="color:var(--accent)"> \){quizScore}</span>
+        </div>
+        <div class="quiz-question">${item.cn}</div>
+        <div class="options" id="options">
+          ${quizOptions.map((opt, i) => `
+            <div class="option" onclick="selectOption(${i})">
+              ${opt.fr}
+            </div>
+          `).join("")}
+        </div>
+      `;
     }
 
-    function restoreDefaults() {
-      showConfirm(
-        currentLang === 'zh' ? '恢复默认值' : 'Reset Database',
-        currentLang === 'zh' ? '此操作将清除自定义修改并还原100条基础数据。是否继续？' : 'This will reset all your custom modifications.',
-        () => {
-          terms = [...DEFAULT_TERMS];
-          saveToLocal();
-          filterTable();
-          showToast(I18N[currentLang].toastRestore, 'success');
-        }
-      );
+    function selectOption(idx) {
+      if (quizAnswered) return;
+      quizAnswered = true;
+      const selected = quizOptions[idx];
+      const correct = window._currentQuizItem;
+      if (selected.fr === correct.fr) {
+        quizScore++;
+      }
+      const optionsEl = document.getElementById("options");
+      if (optionsEl) {
+        optionsEl.querySelectorAll(".option").forEach((el, i) => {
+          el.classList.add("disabled");
+          if (quizOptions[i].fr === correct.fr) el.classList.add("correct");
+          else if (i === idx && selected.fr !== correct.fr) el.classList.add("wrong");
+        });
+      }
+      // 显示下一题按钮
+      const main = document.getElementById("main");
+      const btnRow = document.createElement("div");
+      btnRow.className = "btn-row";
+      btnRow.style.marginTop = "20px";
+      btnRow.innerHTML = `
+        <button class="btn btn-primary" onclick="goNextQuiz()">下一题 →</button>
+        <button class="btn btn-accent" onclick="speak('${correct.fr.replace(/'/g, "\\'")}')">🔊 听发音</button>
+      `;
+      main.appendChild(btnRow);
+      updateStats();
     }
 
-    function exportCSV() {
-      let csvContent = "\ufeff类别,序号,中文意义,斯瓦希里语,推荐音译\r\n";
-      terms.forEach(t => {
-        csvContent += `"${t.cat}",${t.num},"${t.cn}","${t.sw}","${t.py}"\r\n`;
-      });
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `海外安全官指挥术语库_${new Date().toISOString().slice(0, 10)}.csv`;
-      a.click();
+    function goNextQuiz() {
+      quizIndex++;
+      if (quizIndex >= 20) {
+        renderQuizResult();
+      } else {
+        nextQuizQuestion();
+      }
     }
 
-    function importCSV(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(ev) {
-        try {
-          const lines = ev.target.result.split(/\r?\n/);
-          let newCount = 0;
-          lines.slice(1).forEach(row => {
-            if (!row.trim()) return;
-            const cols = row.split(',').map(c => c.replace(/^["']|["']$/g, '').trim());
-            if (cols.length >= 5) {
-              terms.push({
-                id: Date.now() + Math.random(),
-                cat: cols[0],
-                num: parseInt(cols[1]) || (terms.length + 1),
-                cn: cols[2],
-                sw: cols[3],
-                py: cols[4]
-              });
-              newCount++;
-            }
-          });
-          if (newCount > 0) {
-            saveToLocal();
-            filterTable();
-            showToast(`${I18N[currentLang].toastImport} (${newCount})`, 'success');
-          } else {
-            showToast('未发现有效的指挥术语格式', 'error');
+    function renderQuizResult() {
+      const main = document.getElementById("main");
+      const pct = Math.round((quizScore / 20) * 100);
+      main.innerHTML = `
+        <div class="score-banner">
+          <div class="big">${quizScore} / 20</div>
+          <div style="margin-top:8px;">正确率 ${pct}%</div>
+        </div>
+        <div style="text-align:center;margin:24px 0;">
+          ${pct >= 80 ? "🎉 非常棒！继续保持！" : pct >= 60 ? "👍 不错，再接再厉！" : "💪 加油，多练习卡片吧！"}
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="startQuiz()">再测一次</button>
+          <button class="btn btn-ghost" onclick="mode='card'; document.querySelectorAll('#nav button').forEach(b=>b.classList.remove('active')); document.querySelector('[data-mode=card]').classList.add('active'); render()">回到卡片</button>
+        </div>
+      `;
+    }
+
+    // ========== 单词本 ==========
+    function renderList(main) {
+      const cats = getCategories();
+      const list = getFiltered();
+
+      main.innerHTML = `
+        <input class="search-box" type="search" placeholder="搜索中文 / 法语 / 读音…" value="${searchQuery}"
+               oninput="searchQuery=this.value;render()" />
+        <div class="filter-row">
+          ${cats.map(c => `
+            <button class="\( {currentFilter === c ? 'active' : ''}" onclick="currentFilter=' \){c}';render()">${c}</button>
+          `).join("")}
+        </div>
+        <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:10px;">
+          共 ${list.length} 个词
+        </div>
+        <div class="word-list">
+          ${list.length === 0 ? `<div class="empty">没有找到匹配的词汇</div>` :
+            list.map(item => `
+              <div class="word-item">
+                <div class="left">
+                  <div class="cn">${item.cn} ${learned.has(item.cn + "|" + item.fr) ? "✅" : ""}</div>
+                  <div class="fr">${item.fr}</div>
+                  <div class="py">${item.py}</div>
+                </div>
+                <button class="speak-btn" onclick="speak('${item.fr.replace(/'/g, "\\'")}')">🔊</button>
+              </div>
+            `).join("")
           }
-        } catch (err) {
-          showToast('导入失败，请检查CSV格式！', 'error');
-        }
-      };
-      reader.readAsText(file);
-    }
-
-    // ==================== 军事化考核系统 ====================
-    function startExam() {
-      if (terms.length === 0) {
-        showToast('战术数据库为空，无法生成考试！', 'error');
-        return;
-      }
-      // 随机抽取 10 道题目
-      examQuestions = [...terms].sort(() => Math.random() - 0.5).slice(0, 10);
-      currentExamIndex = 0;
-      examScore = 0;
-      document.getElementById('examModal').classList.remove('hidden');
-      showExamQuestion();
-    }
-
-    function showExamQuestion() {
-      const q = examQuestions[currentExamIndex];
-      const nextBtn = document.getElementById('examActionBtn');
-      nextBtn.onclick = submitExamAnswer;
-      nextBtn.innerHTML = `<span>${I18N[currentLang].submitBtn}</span>`;
-      nextBtn.className = "flex-1 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-semibold transition-all shadow-md shadow-green-600/10";
-
-      document.getElementById('examContent').innerHTML = `
-        <div class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 mb-1 tracking-widest uppercase">${q.cat}</div>
-        <div class="text-xl font-black text-zinc-800 dark:text-zinc-100 mb-4 flex items-center gap-1.5">
-          <i class="fas fa-quote-left text-zinc-300"></i> ${q.cn} <i class="fas fa-quote-right text-zinc-300"></i>
-        </div>
-        <div class="text-xs text-zinc-500 mb-3 font-semibold">斯瓦希里语: <span class="text-indigo-600 dark:text-indigo-400 text-sm ml-1 font-bold">${q.sw}</span></div>
-        <div class="relative">
-          <input type="text" id="examAnswer" placeholder="${I18N[currentLang].examEnterAns}" 
-                 class="w-full px-4 py-3 border border-zinc-200 dark:border-zinc-800 dark:bg-zinc-950 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition-all font-semibold" 
-                 onkeydown="if(event.key==='Enter') submitExamAnswer()" autofocus>
         </div>
       `;
-      document.getElementById('examProgress').textContent = `${currentExamIndex + 1} / 10`;
-      document.getElementById('examScore').textContent = `${examScore} 分`;
-      setTimeout(() => {
-        const el = document.getElementById('examAnswer');
-        if(el) el.focus();
-      }, 100);
     }
 
-    // 提交答案
-    function submitExamAnswer() {
-      const answerInput = document.getElementById('examAnswer');
-      if (!answerInput) return;
-      
-      const answer = answerInput.value.trim();
-      if (!answer) {
-        showToast('请输入答案', 'error');
-        return;
-      }
-
-      const q = examQuestions[currentExamIndex];
-      const isCorrect = answer.toLowerCase() === q.py.toLowerCase();
-      
-      const examContent = document.getElementById('examContent');
-      const nextBtn = document.getElementById('examActionBtn');
-
-      if (isCorrect) {
-        examScore += 10;
-        examContent.innerHTML = `
-          <div class="text-center py-4">
-            <div class="w-12 h-12 bg-green-100 dark:bg-green-950 text-green-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-3 animate-bounce">
-              <i class="fas fa-check"></i>
-            </div>
-            <p class="text-lg font-bold text-green-600">${I18N[currentLang].examCorrect}</p>
-            <p class="text-xs text-zinc-500 mt-1">${q.cn} ➜ <span class="font-bold text-green-600">${q.py}</span></p>
-          </div>
-        `;
-      } else {
-        examContent.innerHTML = `
-          <div class="text-center py-4">
-            <div class="w-12 h-12 bg-red-100 dark:bg-red-950 text-red-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-3 animate-pulse">
-              <i class="fas fa-times"></i>
-            </div>
-            <p class="text-base font-bold text-red-500">${I18N[currentLang].examIncorrect}</p>
-            <p class="text-sm font-black text-green-600 dark:text-green-400 mt-1">${q.py}</p>
-            <p class="text-[10px] text-zinc-400 mt-1">您输入的回答: <span class="line-through text-red-400">${answer}</span></p>
-          </div>
-        `;
-      }
-
-      document.getElementById('examScore').textContent = `${examScore} 分`;
-      currentExamIndex++;
-
-      // 修改下一题按钮
-      nextBtn.innerHTML = `<span>${currentExamIndex >= 10 ? '查看结果' : '下一题'} <i class="fas fa-arrow-right"></i></span>`;
-      nextBtn.className = "flex-1 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-semibold transition-all";
-      nextBtn.onclick = currentExamIndex >= 10 ? showExamResult : showExamQuestion;
-    }
-
-    function showExamResult() {
-      const isExcellent = examScore >= 80;
-      const statusIcon = isExcellent ? '🏆' : '👮';
-      const statusText = isExcellent ? '特级海外安全官勋章' : '需进一步强化学习';
-
-      document.getElementById('examContent').innerHTML = `
-        <div class="text-center py-2">
-          <div class="text-4xl mb-3">${statusIcon}</div>
-          <h2 class="text-sm font-black mb-1">${I18N[currentLang].examSuccess}</h2>
-          <p class="text-zinc-400 text-[10px] mb-3">${statusText}</p>
-          <div class="inline-block px-6 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-2xl mb-2">
-            <span class="text-zinc-500 text-[9px] uppercase tracking-wider block">最终得分</span>
-            <span class="text-3xl font-black text-green-600">${examScore}分</span>
-          </div>
+    // ========== 关于 ==========
+    function renderAbout(main) {
+      main.innerHTML = `
+        <div class="about">
+          <h2>关于本软件</h2>
+          <p>本学习软件根据《江湖法语速成 / Le français facile》PDF 整理制作，专为中国在非洲 / 海外工地工作人员快速掌握实用法语口语设计。</p>
+          <p><strong>功能说明：</strong></p>
+          <ul>
+            <li><strong>卡片模式</strong>：中文 → 法语 + 中文谐音读音，支持发音、标记已掌握</li>
+            <li><strong>测验模式</strong>：20 题随机四选一，即时反馈 + 发音</li>
+            <li><strong>单词本</strong>：按分类筛选、搜索、一键发音</li>
+            <li><strong>离线使用</strong>：打开本 HTML 文件即可，数据保存在本地浏览器</li>
+          </ul>
+          <p style="margin-top:16px;"><strong>使用建议：</strong></p>
+          <ul>
+            <li>每天用卡片过 20～30 个词</li>
+            <li>重点听发音，模仿跟读</li>
+            <li>工地常用词优先（机械、工具、安全、时间）</li>
+            <li>标记“已掌握”后可重点复习未掌握的</li>
+          </ul>
+          <p style="margin-top:16px;color:var(--accent);">数据来源：法语口语学习.pdf（扫描全能王）</p>
+          <p style="font-size:0.85rem;margin-top:12px;">提示：浏览器需支持语音合成（Chrome / Edge / Safari 均可）。点击“发音”按钮即可听到标准法语读音。</p>
         </div>
       `;
-      const actBtn = document.getElementById('examActionBtn');
-      actBtn.onclick = startExam;
-      actBtn.innerHTML = `<i class="fas fa-rotate text-xs"></i> <span>${I18N[currentLang].reExam}</span>`;
-      actBtn.className = "flex-1 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-semibold transition-all";
     }
 
-    function exitExam() {
-      showConfirm(
-        currentLang === 'zh' ? '退出考核' : 'Exit Exam',
-        currentLang === 'zh' ? '确定要退出当前考核吗？答题进度不会被保存。' : 'Are you sure you want to exit? Your progress will be lost.',
-        () => {
-          document.getElementById('examModal').classList.add('hidden');
+    // ========== 事件绑定 ==========
+    document.getElementById("nav").addEventListener("click", (e) => {
+      if (e.target.tagName === "BUTTON") {
+        document.querySelectorAll("#nav button").forEach(b => b.classList.remove("active"));
+        e.target.classList.add("active");
+        mode = e.target.dataset.mode;
+        if (mode === "quiz") {
+          quizTotal = 0; // 重置到开始界面
         }
-      );
-    }
-
-    // ==================== 多主题控制 ====================
-    function setTheme(theme) {
-      currentTheme = theme;
-      document.body.classList.remove('dark', 'night-vision', 'matrix-bg');
-      
-      // 重置所有主题按钮选中状态
-      for (let i = 0; i <= 2; i++) {
-        document.getElementById(`themeBtn${i}`).className = "py-2 text-[11px] rounded-lg border dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 font-medium hover:border-green-500 transition-all";
-      }
-
-      const activeBtn = document.getElementById(`themeBtn${theme}`);
-      if (theme === 0) {
-        activeBtn.classList.add('border-green-600', 'text-green-600', 'bg-green-50/50');
-      } else if (theme === 1) {
-        document.body.classList.add('dark');
-        activeBtn.classList.add('border-zinc-400', 'text-white', 'bg-zinc-700');
-      } else if (theme === 2) {
-        document.body.classList.add('night-vision', 'matrix-bg');
-        activeBtn.classList.add('border-green-500', 'text-green-400', 'bg-green-950');
-      }
-    }
-
-    // 开关设置面板
-    function toggleSettings() {
-      document.getElementById('settingsPanel').classList.toggle('hidden');
-    }
-
-    function fakeCloudSync() {
-      exportCSV();
-      showToast(currentLang === 'zh' ? '✅ 云端备份：CSV格式术语库已成功导出并下载至您的设备' : 'Cloud sync completed', 'success');
-    }
-
-    // ==================== 语言切换 ====================
-    function switchLang(lang) {
-      currentLang = lang;
-      
-      // 更新设置界面的高亮
-      document.getElementById('langBtnZh').className = `py-1.5 text-xs rounded-lg border dark:border-zinc-800 hover:border-green-500 transition-all ${lang === 'zh' ? 'bg-green-600 text-white border-green-600' : ''}`;
-      document.getElementById('langBtnEn').className = `py-1.5 text-xs rounded-lg border dark:border-zinc-800 hover:border-green-500 transition-all ${lang === 'en' ? 'bg-green-600 text-white border-green-600' : ''}`;
-
-      // 文本替换
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (I18N[lang] && I18N[lang][key]) {
-          el.textContent = I18N[lang][key];
+        if (mode === "card") {
+          showAnswer = false;
         }
-      });
+        render();
+      }
+    });
 
-      // 占位符替换
-      document.getElementById('searchInput').placeholder = I18N[lang].searchPlaceholder;
-      
-      showToast(I18N[lang].toastSelectLang, 'info');
-      filterTable();
-    }
-
-    // ==================== 系统加载 ====================
-    window.onload = function() {
-      loadFromLocal();
-      setTheme(0);
-      switchLang('zh');
-    };
+    // 初始化
+    shuffled = shuffle(VOCAB);
+    updateStats();
+    render();
   </script>
 </body>
 </html>
-
-```
